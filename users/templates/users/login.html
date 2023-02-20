@@ -1,0 +1,187 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+
+<style type="text/css">
+#id_username{
+  height:30px;
+}
+#id_password{
+  height:30px;
+}
+
+
+body {
+  background: #fafafa;
+ }
+
+/* for desktop */
+@media(min-width:450px) and (max-width:3000px){
+.content-section{
+    margin-top:-60px;
+    text-align: center;
+    color:rgb(0, 0, 0);
+    margin-left:35%;
+    height:380px;
+    width:300px;
+    border-style: solid;
+    border-radius: 1px;
+    border-width: 1px;
+    border-color:rgb(172, 172, 172);
+}
+.asteriskField{
+    display:none; 
+}    
+.login-header{
+    color:rgb(0, 0, 0);
+}
+.login-header H2{
+   font-size: 3rem;
+   font-weight: 800;
+   padding-left: 30px;
+}    
+
+.login-field{
+  
+}
+.form-group{
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+    display:center;
+    justify-content: center;
+ 
+}
+}
+
+/* for mobile  */
+@media(max-width:450px){
+.content-section{
+    margin-top:-10px;
+    text-align: center;
+    color:rgb(0, 0, 0);
+    margin-left:13%;
+    height:380px;
+    width:300px;
+    border-style: solid;
+    border-radius: 1px;
+    border-width: 1px;
+    border-color:rgb(172, 172, 172);
+    background-color: rgb(247, 247, 247);
+}
+.asteriskField{
+    display:none; 
+}    
+.login-header{
+    color:rgb(0, 0, 0);
+    text-align: center;
+}
+.login-header H2{
+   font-size: 3rem;
+   font-weight: 800;
+}    
+.login-header p{
+    margin-top:-15px;
+}
+.login-field{
+  
+}
+.form-group{
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+    display:center;
+    justify-content: center;
+
+}
+}
+</style>
+    
+
+    <div class="login-header">
+        <H2>EVE</H2>
+        <p>Health Care Centers</p>
+    </div>
+<div class="content-section">
+        <form method="POST" >
+            {% csrf_token %}
+          <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Log In</legend>
+              <div class="login-field">
+                  {{ form.username|as_crispy_field }}
+              </div>
+             <div class="login-field" >
+                  {{ form.password|as_crispy_field }}
+              </div>
+
+          </fieldset>
+          <div class="form-group">
+                <button style="height:30px;  width:150px;" class="btn btn-primary"  type="submit">Log In</button>
+                <small class="text-muted ml-2"><br/>
+                    <a href="{% url 'password_reset' %}">Forgot Password?</a>
+                </small>
+          </div>
+        </form>
+
+
+        <div class="border-top pt-3">
+            <small class="text-muted">
+                Need An Account? <a class="ml-2" href="{% url 'register' %}">Sign Up</a>
+            </small>
+        </div>  
+</div>
+
+
+
+<!-- Footer     --------->
+
+<hr/>
+    <main class="lastline-page">
+     <span class="credit"> <a href="#">EVE </a>|</span>
+       <img class="socialmedia" id="copyright" src="{% static 'images/copyright.png' %}" />
+       2021 All rights reserved.
+    </main>
+</div>
+
+<!--Css Of Footer-->
+<style type="text/css">
+  
+/* for desktop */
+@media(min-width:450px) and (max-width:3000px){
+.lastline-page a{
+      font-size: 15px;
+      color:#000000;
+}
+.lastline-page{
+      text-align:center;  
+      font-size: xx-small;
+      color:#929292;
+}
+#copyright{
+      height:15px;
+      width:15px;
+  }
+}
+
+/*Footer-page for mobile  */
+@media(max-width:450px){
+.lastline-page{
+      text-align:center;  
+      font-size: xx-small;
+      color:#929292;
+}
+.lastline-page a{
+      font-size: 15px;
+      color:#000000;
+}
+#copyright{
+      height:15px;
+      width:15px;
+  }
+}
+
+</style>
+
+{% endblock %}

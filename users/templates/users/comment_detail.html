@@ -1,0 +1,203 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+
+<!-- Header   Of Home page -->
+<div class="top">
+  <!-- This is the Menu (Hamburger menu) which was showing on the top-->
+    <nav role="navigation">
+        <div class="logo" ><a href="{% url 'home' %}" style="color:black;">EVE</a></div>
+ <!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+      <div id="menuToggle">
+      <input type="checkbox" />
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+       <div id="profile">
+           <a  href="{% url 'profile' %}"><li>
+             <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+           <p>Hello, {{ user.profile.your_name }}</p></li></a>
+       </div>
+
+           <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+           <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+<hr/>       {% if user.is_authenticated %}
+          <a href="{% url 'appointments' %}"><li>Appointments</li></a><hr/>
+          <a href="{% url 'profile' %}"><li>Profile</li></a><hr/>
+           <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+          {% else %}
+           <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+           <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+          {% endif %}
+      </ul>
+     </div>
+    </nav>
+</div>
+<!--End Of Header -->
+
+
+
+
+
+<form method="POST">
+    {% csrf_token %}
+    <h3> Comment</h3>
+    <div class="messagebox">
+       <div class="comment-detail-box">
+           <p class="comment-detail-user">{{object.user}}</p>
+           <p class="comment-detail-comment">{{object.comment}}</p>
+           <p class="comment-detail-timestamp">{{ object.timestamp }}</p>
+       </div>
+        {% if object.user == user %}
+        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'comment_form' object.sno %}">Update</a>
+        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'comment_confirm_delete' object.sno %}">Delete</a>
+        {% endif %}
+    </div>
+</form>
+
+<style>
+
+.messagebox{
+    padding:20px;
+}
+
+.comment-detail-box{
+  border-width: 1px;
+  border-style: solid;
+  border-radius:0;
+  border-color: #a7a7a7;
+  padding:10px;
+}
+.comment-detail-user{
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.comment-detail-comment{
+  font-size: 20px;
+}
+.comment-detail-timestamp{
+  color:#a5a5a5;
+  font-size: 15px;
+}
+</style>
+
+
+
+<!-- Footer     --------->
+<hr/>
+<div class="footer-container-page">
+    <section class="footer-page">
+      <div class="footerlinks-page" >
+         <a href="{% url 'about' %}"> About Us</a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}"> Contact </a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}">Add Your Clinic/Hospital</a>
+     </div>
+
+    </section>
+
+    <div class="socialcontainer-page">
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/facebook.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/instagram.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/twitter.png' %}" /></a>
+    </div>
+
+    <main class="lastline-page">
+     <span class="credit"> <a href="#">EVE </a>|</span>
+       <img class="socialmedia" id="copyright" src="{% static 'images/copyright.png' %}" />
+       2021 All rights reserved.
+    </main>
+
+</div>
+
+<!--Css Of Footer-->
+<style type="text/css">
+
+  /* for desktop */
+  @media(min-width:300px) and (max-width:3000px){
+    .footer-container-page{
+      display:block;
+      text-align:center;
+     }
+    .footer-page{
+      justify-content:center;
+      display:flex;
+    }
+    .footerlinks-page{
+      padding-left:40px;
+
+    }
+    .footerlinks-page a{
+      color:rgb(153, 153, 153);
+      font-size: xx-small;
+    }
+    .socialmedia-page{
+      height:20px;
+      width:50px;
+      padding-left:30px;
+    }
+    .lastline-page a{
+      font-size: 15px;
+      color:#000000;
+    }
+    .lastline-page{
+      font-size: xx-small;
+      color:#929292;
+    }
+    #copyright{
+      height:15px;
+      width:15px;
+    }
+  }
+
+
+    /*Footer-page for mobile  */
+
+    @media(max-width:300px){
+    .footer-container-page{
+      display:block;
+      text-align:center;
+     }
+    .footer-page{
+      justify-content:center;
+      display:flex;
+    }
+    .footerlinks-page{
+      padding-left:10px;
+
+    }
+    .footerlinks-page a{
+      color:rgb(153, 153, 153);
+      font-size: xx-small;
+    }
+    .socialmedia-page{
+      height:20px;
+      width:50px;
+      padding-left:30px;
+    }
+    .lastline-page a{
+      font-size: 15px;
+      font-weight: 700;
+      color:#080808;
+    }
+    .lastline-page{
+      font-size: xx-small;
+      color:#929292;
+    }
+    #copyright{
+      height:15px;
+      width:15px;
+    }
+  }
+  </style>
+  <!--End Of Footer-for-page-->
+
+{% endblock %}

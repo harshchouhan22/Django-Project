@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Prescription</title>
+    </head>
+    <body>
+
+        <div class="header">
+
+          <div class="left_header">
+            <div class="eve_rep">EVE</div>
+            <div>Dr. {{ dr_First_Name }} {{ dr_Last_Name }}</div>
+            <div>{{ doctors_speciality }}</div>
+          </div>
+
+          <div>{{ CareCenter_name }}</div>
+
+          <div class="right-header">
+            <div >{{ doctors_treatment }}</div>
+            <div >{{ doctors_timing }}</div>
+          </div>
+        </div>    
+<hr/>
+        <div class="box-line"></div>
+        <div class="secnd-hedr">
+            <p class="patient_name">Patient Name: {{ Patient_First_Name }} {{ Patient_Last_Name }}</p>
+            <p class="date">{{ Appointment_date }}</p>
+        </div>
+
+        <div class="pres-box">
+            <p class="pres"><li>{{ Writing_prescription|linebreaks }}</li></p><br/>
+        </div>
+       
+        <div class="footer">
+          <div class="footer-detail">
+            <p class="address">Address: {{ Center_address }}</p>
+
+            <p class="rep-name">Receptionists Name: {{ receptionists_name }}</p>
+          </div>    
+            <p class="eve-rep">EVE @ evehealthcarecenters.com</p>
+            <p class="contact">Reception Contact: {{ Center_contact }}</p>
+        </div>
+    </body>
+
+<style type="text/css" >
+
+.header  > * {
+  display:inline-block;
+
+
+}
+.right-header  > * {
+  display:inline-block;
+  vertical-align:right;
+  background-color:lightgreen;
+  padding-left: 2cm;
+}
+
+.left_header  > * {
+display:flex;
+  width:100px;
+}
+.eve_rep  {
+  font-size: 18px;
+  font-weight: 500;
+  padding: 100px;
+}
+
+
+
+</style>
+
+
+</html>

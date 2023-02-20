@@ -1,0 +1,47 @@
+{% extends "blog/base.html" %}
+
+{% block body %}
+
+
+    <h1 class="mb-3">Appointments By {{ view.kwargs.username }} ({{ page_obj.paginator.count }})</h1>
+
+    <TABLE class="flayout" >
+    <TR>
+        <TD class="f1">No.</TD>
+        <TD class="f2">Patient Name</TD>
+        <TD class="f3">Timing</TD>
+        <TD class="f4">Reciept-Image</TD>
+    </TR>
+        {% for table1 in table1s %}
+    <TR>
+        <TD class="c1">{{ table1.no }}</TD>
+        <TD class="c2"><a href="{% url 'Table1_detail' table1.id %}">{{ table1.patient_name }}</a></TD>
+        <TD class="c3">{{ table1.timing }}</TD>
+        <TD class="c3">{{ table1.image }}</TD>
+
+    </TR>
+        {% endfor %}
+    </TABLE>
+
+
+    {% if is_paginated %}
+      {% if page_obj.has_previous %}
+        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+      {% endif %}
+
+    {% endif %}
+{% endblock %}

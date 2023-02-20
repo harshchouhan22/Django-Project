@@ -1,0 +1,485 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+<!-- Header   Of Home page -->
+<div class="Entire-Header">
+  <!-- This is the Menu (Hamburger menu) which was showing on the top-->
+    <nav role="navigation">
+        <div class="logo" ><a href="{% url 'home' %}" style="color:black;">EVE</a>
+          <p>Doctor- {{ user.doctor.First_Name }} {{ user.doctor.Last_Name }}</p>
+        </div>
+ <!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+      <div id="menuToggle">
+      <input type="checkbox" />
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+       <div id="profile">
+           <a  href="{% url 'doctors_as_user_profile' %}"><li>
+             <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+             <p>Hello, {{ user.doctor.First_Name }}</p></li></a>
+       </div>
+
+           <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+
+           <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+
+<hr/>       {% if user.is_authenticated %}
+           <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+          {% else %}
+           <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+           <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+          {% endif %}
+      </ul>
+     </div>
+    </nav>
+</div>
+
+<style>
+/* Logo For Desktop */
+@media(min-width:450px) and (max-width:3000px){
+.Entire-Header{
+  height:45px;
+}
+
+.logo{
+  display:block;
+  font-size:30px;
+  font-weight:700;
+
+  padding-left: 50px;
+  padding-top:0px;
+  padding-bottom: 0px;
+
+  }
+.logo p {
+  font-size:15px;
+  font-weight:400;
+  padding-top: 10px;
+  padding-right: 20px;
+  float:right;
+}
+}
+/* For Mobile */
+@media(max-width:450px){
+.Entire-Header{
+  height:40px;
+}
+
+}
+</style>
+
+<!--End Of Header -->
+
+<!--Middle Section Starts-->
+
+
+<br/>
+<a class="button btn-success"  href="?{{ today }}">Today</a>
+
+<H4>
+     <form method="GET">
+         <div  style=" display: inline-block;">
+             <p style=" display: inline-block;"><label>Appointments Of {{ event.appointment_date|date:'jS F Y' }}</label></p>
+             <p style=" display: inline-block;"><input type="date" class="form-control" name="date" style="cursor:pointer;  "  id="DefaultDate" value="{% now 'Y-m-d' %}"></p>
+             <p style=" display: inline-block;"><input type="submit" class="button btn-success" style="cursor:pointer; " value="Submit"></p>
+         </div>
+     </form>
+ </H4>
+
+
+
+  <TABLE class="flayout" >
+    <TR>
+        <TD id="topelement" class="f1">No.</TD>
+        <TD id="topelement" class="f2">Patient Name</TD>
+        <TD id="topelement" class="f3">Timing</TD>
+        <TD id="topelement" class="f4">Prescription</TD>
+        <TD id="topelement" class="f5">Video/Chat</TD>
+        <TD id="topelement" class="f6">Mode</TD>
+        <TD id="topelement" class="f7">Date</TD>
+
+    </TR>
+
+    <!--booked appointments showing -->
+      {% for appointments_booked in appointments_booked %}
+    <TR>
+        <TD class="c1">{{ appointments_booked.no }}</TD>
+        <TD class="c2"><a  href="{% url 'Table1_detail' appointments_booked.id %}">{{ appointments_booked.First_Name }} {{ appointments_booked.Last_Name }}</a></TD>
+        <TD class="c3">{{ appointments_booked.start_time|date:'H:i A' }}-{{ appointments_booked.end_time|date:'H:i A' }}</TD>
+        <TD class="c4"><a  href="{% url 'Appointment_Table_update' appointments_booked.id %}">Prescription</a></TD>
+        <TD class="c5"><a href="{% url 'chatPage'  appointments_booked.patient_name.id  %}">Chat</a></TD>
+        <TD class="c6">{{ appointments_booked.mode }}</TD>
+        <TD class="c7">{{ appointments_booked.appointment_date|date:'jS F Y' }}</a></TD>
+    </TR>
+      {% endfor %}
+      {% for event in event %}
+    <TR>
+        <TD class="c1">{{ event.no }}</TD>
+        <TD class="c2">Available</TD>
+        <TD class="c3">{{ event.start_time|date:'H:i A' }}-{{ event.end_time|date:'H:i A' }}</TD>
+        <TD class="c4">{{ event.appointment_date|date:'jS F Y' }}</TD>
+        {% endfor %}
+     </TR>
+  </TABLE>
+</div>
+
+<br/>
+
+    {% if event %}
+        {% for appointments_booked in appointments_booked %}
+          {% empty %}
+            <H5><li>No Appointments Booked Today</li></H5>
+        {% endfor %}
+    {% else %}    
+          <h5>No Timeslots Created For Today , To Create Ask Your Receptionists</h5>
+    {% endif %}
+
+
+<div class="post-pagination">
+      {% if is_paginated %}
+
+      {% if page_obj.has_previous %}
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a id="pagibtn" class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+      {% endif %}
+
+    {% endif %}
+</div>
+
+
+<style type="text/css">
+.post-pagination{
+  display:block;
+  text-align: center;
+}
+#pagibtn{
+  color:rgb(0, 0, 0);
+  padding:5px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+
+
+/* Time  Table  for desktop */
+  @media(min-width:450px) and (max-width:3000px){
+
+.container-result{
+  padding-left: 3%;
+  padding-right: 2%;
+  padding-top: 1%;
+  height:400px;
+  font:normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+  color:#000000;
+  background: #E6EAE9;
+
+  }
+.appointment-archive-container{
+  border-width: 1px;
+  border-style: solid;
+  border-radius:1px;
+  border-color: #8a8a8a;
+  height:500px;
+}
+.flayout{
+
+width:100%;
+}
+
+td {
+    border-right: 0px solid #C1DAD7;
+    border-bottom: 2px solid #C1DAD7;
+    background: #fff;
+    padding: 6px 6px 6px 12px;
+    color: #4f6b72;
+}
+
+.f1{
+    padding-left: 20px;
+    width:70px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.f2{
+    width:22%;
+    padding-left: 0px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.f3{
+    width:210px;
+    padding-left: 0px;
+    font-size: 1rem;
+    font-weight: 300;
+}
+.f4{
+  width:180px;
+  padding-left: 0px;
+  font-size: 1rem;
+  font-weight: 300;
+}
+
+.c1{
+  padding-left: 20px;
+  height:20px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.c2{
+  padding-left: 0px;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.c3{
+  padding-left: 0px;
+  font-size: 18px;
+  font-weight: 500;
+}
+.c4{
+padding-left: 0px;
+font-size: 18px;
+font-weight: 500;
+}
+}
+
+
+
+
+/*TABLE for mobile  */
+@media(max-width:450px){
+
+/*--Header--*/
+.top{
+  height:35px;
+  padding-bottom:0px;
+}
+
+  .container-result{
+  padding-left: 2%;
+  padding-right: 2%;
+  height:100%;
+
+  padding-top: 1%;
+  font:normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+  color:#000000;
+  background: #E6EAE9;
+  }
+  .container-result h4{
+    font-size: 1vw;
+  }
+
+  td {
+        border-right: 0px solid #C1DAD7;
+        border-bottom: 2px solid #C1DAD7;
+        background: #fff;
+        padding: 6px 6px 6px 6px;
+        color: #4f6b72;
+  }
+.f1{
+    color:black;
+    padding-left: 2px;
+    font-size: 20px;
+    font-weight:700;
+}
+.f2{
+   width:40%;
+   color:black;
+   padding-left: 2px;
+   font-size: 20px;
+   font-weight:700;
+   }
+   .f3{
+
+     color:black;
+     font-size:20px;
+     font-weight:700;
+   }
+   .f4{
+     font-size: 20px;
+     font-weight:700;
+     padding-left: 0px;
+   }
+
+   .c1{
+    color:black;
+    padding-left: 10px;
+    font-size: 1rem;
+    font-weight: 800;
+   }
+
+   .c2{
+    font-size: 1.1rem;
+    font-weight: 600;
+   }
+   .c2 a{
+    color:rgb(26, 26, 27);
+   }
+  .c3{
+    font-size: .9rem;
+    font-weight: 600;
+    width:30%;
+  }
+  .c3 a{
+    color:rgb(26, 26, 27);
+   }
+   .c4{
+    padding-left: 0px;
+    font-size: .9rem;
+    font-weight: 600;
+   }
+  }
+  </style>
+
+
+
+
+
+
+
+<!-- Footer     --------->
+
+<div class="footer-container-page">
+    <section class="footer-page">
+      <div class="footerlinks-page" >
+         <a href="{% url 'about' %}"> About Us</a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}"> Contact </a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}">Contact Company</a>
+     </div>
+
+    </section>
+
+    <div class="socialcontainer-page">
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/facebook.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/instagram.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/twitter.png' %}" /></a>
+    </div>
+
+    <main class="lastline-page">
+     <span class="credit"> <a href="#">EVE </a>|</span>
+       <img class="socialmedia" id="copyright" src="{% static 'images/copyright.png' %}" />
+       2021 All rights reserved.
+    </main>
+
+</div>
+
+<!--Css Of Footer-->
+<style type="text/css">
+
+/* for desktop */
+@media(min-width:450px) and (max-width:3000px){
+.footer-container-page{
+  display:block;
+  text-align:center;
+
+  margin-top:300px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #dbdbdb;
+  }
+.footer-page{
+  justify-content:center;
+  display:flex;
+}
+.footerlinks-page{
+  padding-left:40px;
+
+}
+.footerlinks-page a{
+  color:rgb(153, 153, 153);
+  font-size: xx-small;
+}
+.socialmedia-page{
+  height:20px;
+  width:50px;
+  padding-left:30px;
+}
+.lastline-page a{
+  font-size: 15px;
+  color:#000000;
+}
+.lastline-page{
+  font-size: xx-small;
+  color:#929292;
+}
+#copyright{
+  height:15px;
+  width:15px;
+}
+}
+
+
+/*Footer-page for mobile  */
+
+@media(max-width:450px){
+.footer-container-page{
+  display:block;
+  text-align:center;
+  margin-top:300px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #dbdbdb;
+  }
+.footer-page{
+  justify-content:center;
+  display:flex;
+}
+.footerlinks-page{
+  padding-left:10px;
+
+}
+.footerlinks-page a{
+  color:rgb(153, 153, 153);
+  font-size: xx-small;
+}
+.socialmedia-page{
+  height:20px;
+  width:50px;
+  padding-left:30px;
+}
+.lastline-page a{
+  font-size: 15px;
+  font-weight: 700;
+  color:#080808;
+}
+.lastline-page{
+  font-size: xx-small;
+  color:#929292;
+}
+#copyright{
+  height:15px;
+  width:15px;
+}
+}
+</style>
+<!--End Of Footer-for-page-->
+
+
+
+
+
+{% endblock %}

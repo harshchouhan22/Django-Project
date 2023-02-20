@@ -1,0 +1,373 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+
+:root{
+      overflow-x: hidden;
+   }
+
+/* Header  */
+@media(min-width:450px) and (max-width:3000px){
+.Entire-Header{
+  background-color: rgb(164, 221, 218);
+  padding-bottom: 3px;
+  height:100px;
+
+}
+}
+@media(max-width:450px){
+  .Entire-Header{
+  background-color: rgb(164, 221, 218);
+  padding-bottom: 3px;
+  height:90px;
+
+}
+}
+/* logo For Mobile  */
+@media(max-width:450px){
+.logo{
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight:700;
+  padding-top: 0px;
+  font-weight:1000px;
+}
+}
+/* Logo For Desktop */
+@media(min-width:450px) and (max-width:3000px){
+.logo{
+  display:block;
+  font-size:40px;
+  font-weight:600;
+  text-align: center;
+  color:black;
+  }
+}
+
+.logo a{
+  color:black;
+}
+/* end of logo */
+
+
+
+
+/* Start of hamburger menu */
+
+/*User's Name In Hamburger Menu*/
+/* For Mobile */
+
+#profile{
+    display:block;
+    background: #ffffff;
+    margin-bottom: 10px;
+    margin-left:-20px;
+    height:80px;
+    border-bottom: #a5a5a5;
+    border-style: solid;
+    border-width: 1px;
+}
+
+/* For Desktop */
+@media(min-width:450px) and (max-width:3000px){
+#profile p{
+  display:block;
+  font-size:18px;
+  font-weight: 600;
+}
+}
+/* for mobile Middle Headings */
+@media(max-width:450px){
+#profile p{
+  display:block;
+  font-size:.8rem;
+  font-weight: 600;
+}
+}
+/* For Desktop */
+
+#menu{
+  display:block;
+  position: absolute;
+  width: 250px;
+  margin: -140px 0 0 -50px;
+  padding-right: 0px;
+  padding-top: 110px;
+  padding-left: 40px;
+  padding-bottom: 210px;
+  background: #f8f8f8;
+  list-style-type: none;
+  -webkit-font-smoothing: antialiased;
+  /* to stop flickering of text in safari */
+  transform-origin: 0% 0%;
+  transform: translate(-100%, 0);
+  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+}
+/*Menu For Mobile */
+@media(max-width:450px){
+  #menu{display:block;
+    width:80%;
+    height:600px;
+  }
+}
+#menuToggle{
+  display: fixed;
+  position: relative;
+  top: -25px;
+  left: 10px;
+  z-index: 1;
+  color:rgb(255, 255, 255);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+
+
+
+#menuToggle
+{
+  display: fixed;
+  position: relative;
+  top: -10px;
+  left: 10px;
+  z-index: 1;
+  color:rgb(255, 255, 255);
+  -webkit-user-select: none;
+  user-select: none;
+}  
+
+
+#menu li{
+  padding-left:30px;
+  font-size: 1rem;
+  height:20px;
+  font-weight:400;
+}
+
+
+
+
+/* buttons inside of hamburger menu */
+#menuToggle a
+{
+  text-decoration: none;
+  font-size:1.5rem;
+  color: #000000;
+  background-color:black;
+  transition: color 0.03s ease;
+}
+#menuToggle a:hover{
+  color: rgba(172, 169, 169, 0.884);
+}
+/* button of hamburger menu which on click menu is open*/
+#menuToggle input{
+  display: block;
+  width: 40px;
+  height: 32px;
+  position: absolute;
+  top: -25px;
+  left: -5px;
+  color:black;
+  cursor: pointer;
+  opacity: 0; /* hide this */
+  z-index: 2; /* and place it over the hamburger */
+  -webkit-touch-callout: none;
+}
+
+/*Just a quick hamburger look of hamburger button*/
+#menuToggle span
+{
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin-bottom: 5px;
+  position: relative;
+  top:-20px;
+  background: #000000;
+  border-radius: 2px;
+  z-index: 1;
+  transform-origin: 4px 0;
+  transition: transform 0.1s cubic-bezier(.77,0.2,0.05,1.0),
+              background 0.1s cubic-bezier(0.77,0.2,0.05,1.0),
+              opacity 0.55s ease;
+}
+#menuToggle span:first-child
+{
+  transform-origin: 0% 0%;
+}
+#menuToggle span:nth-last-child(2)
+{
+  transform-origin: 0% 100%;
+}
+
+/*Transform all the slices of hamburger into a crossmark. */
+
+#menuToggle input:checked ~ span
+{
+  opacity: 1;
+  transform: rotate(45deg) translate(-1px, -0.5px);
+  background: #232726;
+}
+
+/*But let's hide the middle one. */
+#menuToggle input:checked ~ span:nth-last-child(3)
+{
+  opacity: 0;
+  transform: rotate(0deg) scale(0.2, 0.2);
+}
+
+/* Ohyeah and the last one should go the other direction */
+
+#menuToggle input:checked ~ span:nth-last-child(2)
+{
+  transform: rotate(-45deg) translate(2.5px, -2.5px);
+}
+
+/* And let's slide it in from the left */
+#menuToggle input:checked ~ ul
+{
+  transform: none;
+}
+/* End Of Hamburger Menu */
+
+
+
+
+/* SEARCH BAR CSS    */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+*{
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+
+
+/*Search Bar For Mobile*/
+
+@media(max-width:450px){
+.searchform{
+  margin-top: -20px;
+}
+.wrapper .search-input{
+    display: block;
+    text-align:center;
+    display:center;
+}
+.search-input input{
+  height: 30px;
+  width: 80%;
+  font-size: 1rem;
+  outline: none;
+  border-style: solid;
+  border-radius: .1px;
+  border-width:1px;
+  border-color:#8a8a8a;
+  padding: 0 20px 0 5px;
+  font-size: 3vw auto;
+  font-weight:10;
+  font-family: sans-serif;
+  box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1);
+}
+.search-input.active input{
+  border-radius: 5px 5px 0 0;
+}
+.search-input .autocom-box{
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.search-input.active .autocom-box{
+  padding: 10px 8px;
+  opacity: 1;
+  pointer-events: auto;
+}
+.autocom-box li{
+  list-style: none;
+  padding: 8px 12px;
+  display: none;
+  width: 100%;
+  cursor: default;
+  border-radius: 3px;
+}
+.search-input.active .autocom-box li{
+  display: block;
+}
+.autocom-box li:hover{
+  background: #1a1818;
+}
+#searchicon{
+margin-top: -29px;
+margin-left:70%;
+height:27px;
+width:30px;
+border:none;
+background-color: rgb(255, 255, 255);
+}
+}
+
+
+
+/* Search Bar For Desktop  */
+
+@media(min-width:450px) and (max-width:3000px){
+.searchform{
+  margin-top: -20px;
+}
+.wrapper .search-input{
+  text-align:center;
+  display:center;
+}
+.search-input input{
+  height: 30px;
+  width: 80%;
+  font-size: 1rem;
+  outline: none;
+  border-style: solid;
+  border-radius: 3px;
+  border-width:1px;
+  border-color: grey;
+  padding: 0 20px 0 5px;
+  font-size: 3vw auto;
+  font-weight:10;
+  font-family: sans-serif;
+  box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1);
+}
+.search-input.active input{
+  border-radius: 5px 5px 0 0;
+}
+.search-input .autocom-box{
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.search-input.active .autocom-box{
+  padding: 10px 8px;
+  opacity: 1;
+  pointer-events: auto;
+}
+.autocom-box li{
+  list-style: none;
+  padding: 8px 12px;
+  display: none;
+  width: 100%;
+  cursor: default;
+  border-radius: 3px;
+}
+.search-input.active .autocom-box li{
+  display: block;
+}
+.autocom-box li:hover{
+  background: #1a1818;
+}
+#searchicon{
+margin-top: -27px;
+margin-left:75%;
+height:25px;
+width:30px;
+border:none;
+background-color: rgb(255, 255, 255);
+}
+}

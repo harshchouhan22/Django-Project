@@ -1,0 +1,957 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+
+<div class="Entire-Header">
+  <!-- This is the Menu (Hamburger menu) which was showing on the top-->
+    <nav role="navigation">
+        <div class="logo" ><a href="{% url 'home' %}">EVE</a></div>
+
+    <div id="menuToggle">
+        <input type="checkbox" />
+        <span></span>
+        <span></span>
+        <span></span>
+        <ul id="menu">
+            <div id="profile">
+              <a id="profile-words" href="{% url 'profile' %}"><li>
+              <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+              <p> Hello, {{ request.user.First_Name }}</p></li></a>
+            </div>
+              <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+              <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+        <hr/>{% if user.is_authenticated %}
+                  <a href="{% url 'appointments' %}"><li>Appointments</li></a><hr/>
+                  <a href="{% url 'profile' %}"><li>Profile</li></a><hr/>
+                  <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+              {% else %}
+                  <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+                  <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+              {% endif %}
+
+        </ul>
+      </div>
+    </nav>
+</div>
+
+<style>
+/* Logo For Desktop */
+@media(min-width:450px) and (max-width:3000px){
+.Entire-Header{
+  height:40px;
+}
+
+.logo{
+  display:block;
+  font-size:25px;
+  font-weight:500;
+  text-align: left;
+  padding-left: 50px;
+  padding-top:0px;
+  }
+#menuToggle
+{
+  display: fixed;
+  position: relative;
+  top: -8px;
+  left: 10px;
+  z-index: 1;
+  color:rgb(240, 226, 226);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+}
+/* For Mobile */
+@media(max-width:450px){
+.Entire-Header{
+  height:40px;
+}
+
+.logo{
+  display:block;
+  font-size:1.8rem;
+  font-weight:500;
+  }
+#menuToggle
+{
+  display: fixed;
+  position: relative;
+  top: -10px;
+  left: 10px;
+  z-index: 1;
+  color:rgb(240, 226, 226);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+}
+</style>
+<!--End Of Header -->
+
+<!--Doctor-Detail-->
+<div class="container my-3">
+    <div class="ts">
+             <div class="imagebox">
+               <img src="{{object.image.url}}" class="image" >
+             </div>
+
+        <div class="detailspage">
+          <div class="name"> Dr. {{object.First_Name}} {{object.Last_Name}}</div>
+          <div><p class="speciality">{{object.speciality}}</p></div>
+          <div><p class="experience">{{object.experience}} Years Experience</p></div>
+          <div><p class="about">{{object.about|safe|truncatewords:"13"}}<a href="{{ url_for_full_content }}">read more</a></p></div>
+          <div><p class="storeno">Store No.-{{object.CareCenter.storeno}} </p></div>
+          <div><p class="timing"><B>Timing:</B> {{object.timing}}</p></div>
+          <div><p class="address"><B>Address:</B> {{object.CareCenter.Address}}</p></div>
+            <div><p class="fees"><b>Fees:</b> {{object.fee}}</p></div>
+            <div><p class="fees"><b>Treatments:</b> {{object.treatment}}</p></div>
+          
+        </div>
+
+    </div>
+</div>
+
+
+
+<!-- Search bar For Table's-->
+
+
+
+
+<!-- Appointment Table-->
+
+<h5><a class="btn btn-primary"  href="?{{ today }}">Today</a></h5>
+
+<div class="container-result">
+ <H4>
+     <form method="GET">
+         <div  style=" display: inline-block;">
+             <p style=" display: inline-block;"><label>Appointments Of {{ event.appointment_date|date:'jS F y' }}</label></p>
+             <p style=" display: inline-block;"><input type="date" class="form-control" name="date"  style="cursor:pointer; width:150px;" id="DefaultDate" value="{% now 'Y-m-d' %}"></p>
+             <p style=" display: inline-block;"><input type="submit" class="button btn-success" style="cursor:pointer; " value="Submit"></p>
+         </div>
+     </form>
+ </H4>
+
+  <TABLE class="flayout" >
+    <TR>
+        <TD id="topelement" class="f1">No.</TD>
+        <TD id="topelement" class="f2">Patient Name</TD>
+        <TD id="topelement" class="f3">Timing</TD>
+        <TD id="topelement" class="f4">Date</TD>
+        <TD id="topelement" class="f4">Mode</TD>
+    </TR>
+
+    <!--booked appointments showing -->
+      {% for appointments_booked in appointments_booked %}
+    <TR class="dateRow" >
+        <TD class="c1">{{ appointments_booked.no }}</TD>
+        <TD class="c2"> {% if object.patient_name == user %}<a  href="{% url 'Table1_detail' appointments_booked.id %}">{{ appointments_booked.First_Name }} {{ appointments_booked.Last_Name }}</a>{% else %}{{ appointments_booked.First_Name }} {{ appointments_booked.Last_Name }} {% endif %} </TD>
+        <TD class="c3">{{ appointments_booked.start_time|date:'H:i A' }}-{{ appointments_booked.end_time|date:'H:i A' }}</TD>
+        <TD class="c4">{{ appointments_booked.appointment_date|date:'jS F y' }}</TD>
+        <TD class="c5">{{ appointments_booked.mode }}</TD>
+
+    </TR>
+      {% endfor %}
+      {% for event in event %}
+    <TR>
+        <TD class="c1">{{ event.no }}</TD>
+        <TD class="c2"><a href="{{ event.pk }}/Table1_form/">Available </a></TD>
+        <TD class="c3">{{ event.start_time|date:'H:i A' }}-{{ event.end_time|date:'H:i A' }}</TD>
+        <TD class="c4">{{ event.appointment_date|date:'jS F Y' }}</TD>
+        {% endfor %}
+     </TR>
+
+  </TABLE>
+</div>
+
+<br/>
+<br/>
+   {% for event in event %}
+       {% empty %}
+        <H5>No Timeslots are Available</H5>
+   {% endfor %}
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+
+<script>
+function display_ct5() {
+var x = new Date()
+var ampm = x.getHours( ) >= 12 ? ' PM' : ' AM';
+
+var x1=x.getMonth() + 1+ "/" + x.getDate() + "/" + x.getFullYear(); 
+x1 =   x.getHours( )+ ":" +  x.getMinutes() + ":" +  x.getSeconds() + ":" + ampm;
+document.getElementById('ct5').innerHTML = x1;
+display_c5();
+ }
+function display_c5(){
+var refresh=1000; // Refresh rate in milli seconds
+mytime=setTimeout('display_ct5()',refresh)
+}
+display_c5()
+
+
+function light() {
+    var dateStart = document.querySelector('#dateStart');
+    var dateEnd = document.querySelector('#dateEnd');
+    var ct5 = document.querySelector('#ct5')
+
+    if (ct5 <= dateStart && ct5 <= dateEnd ) {
+      dateStart.classList.add('highlight');
+    }
+    else{
+      dateStart.classList.remove('highlight');
+    }
+  }
+light()  
+
+$('#timeTable .dateRow').each(function () {
+  var startTime = $(this).closest("tr").find(".dateRowStart") .text();
+  var endTime = $(this).closest("tr").find(".dateRowEnd").text();
+  if (moment().isBetween(startTime, endTime)) {
+      $(this).addClass('highlight'); 
+  } 
+});
+</script>
+<span id='ct5' style="background-color: #FFFF00"></span>
+<style>
+  .highlight{
+    color:red;
+  }
+</style>
+
+<div class="post-pagination">
+      {% if is_paginated %}
+
+      {% if page_obj.has_previous %}
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a id="pagibtn" class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+      {% endif %}
+    {% endif %}
+</div>
+<hr/>
+
+
+
+<br/>
+
+
+      <div class="comments">
+        <div class="comments-details">
+          <span class="total-comments comments-sort">Comments</span>
+        </div>
+        <div class="comment-box add-comment">
+          <span class="commenter-pic">
+            <img src="{{ user.profile.image.url }}" class="rounded-circle account-img">
+          </span>
+          <span class="commenter-name">
+                <div class="chatTitleContainer">
+               {% if user.is_authenticated %}
+               {% if new_comment %}
+              <div class="alert alert-success" role="alert">Your comment is awaiting moderation</div>
+               {% else %}
+           <form  method="POST" >
+                 {% csrf_token %}
+                 {{ form.comment|as_crispy_field }}
+                 {{ form.doctor|as_crispy_field }}
+            <button type="submit" class="btn btn-default">Comment</button>
+            <button type="cancel" class="btn btn-default">Cancel</button>
+           </form>
+          </span>
+        </div>
+         {% endif %}
+         {% else %}
+            <a class="btn btn-outline-info" href="{% url 'login' %}?next={{request.path}}">Log in to add a comment!</a><br>
+         {% endif %}
+      </div>
+
+
+<div class="comment-container">
+      <table class="form-comments-table">
+        {% for comment in comments.all %}
+        <tr class="comment-box">
+          <td class="comment-image">
+              <img src="{% static 'images/media-4' %}">
+          </td>
+
+          <td class="comment-user">{{ comment.user }}</td>
+
+          <td class="comment-comment">
+              <a href= "{% url 'comment_detail' comment.sno %}">
+              <p>
+              {{ comment.comment|safe|truncatewords:"8" }}
+              </p>
+              </a>
+          </td>
+
+          <td class="comment-timestamp" >
+              {{ comment.timestamp }}
+          </td>
+        </tr>
+        {% for reply in comment.replies.all %}
+           {{ reply.comment }}
+        {% endfor %}
+        {% empty %}
+          <p>No comments here yet :</p>
+        {% endfor %}
+      </table>
+</div>
+
+<!--CSS For Comment section -->
+
+<style>
+.select form-control{
+display:none;}
+
+#id_doctor{display:none;
+}
+</style>
+<style>
+.comment-container{
+  padding:2px;
+}
+
+.form-comments-table{
+  height:fit-content;
+  width:100%;
+  border-width: 1px;
+  border-style: solid;
+  border-radius:1rem;
+  border-color: #110e0e;
+  padding:200px;
+}
+.comment-box{
+  border-width: 5rem;
+  border-style: solid;
+  border-radius:3rem;
+  border-color: #000000;
+
+}
+.comment-image{
+height:20px;
+width:20px;
+border-radius:5rem;
+}
+.comment-image img{
+  height:40px;
+  width:40px;
+  border-radius:5rem;
+}
+.comment-user{
+  color:#000000;
+font-weight:600;
+}
+.comment-comment{
+
+height:fit-content;
+overflow-wrap: break-word;
+}
+.comment-comment p{
+height:fit-content;
+width:25rem;
+}
+.comment-timestamp{
+
+}
+</style>
+
+
+
+<style>
+.comments .comment-box {
+    background-color: #FAFAFA;
+    padding-bottom:100px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+.comments .add-comment {
+    background-color: transparent;
+    border: none;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+
+.comments .commenter-pic {
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    border-radius: 100%;
+    border: 2px solid #fff;
+    overflow: hidden;
+    background-color: #fff;
+    margin-top:30px;
+}
+.commenter-pic img{
+  width: 50px;
+    height: 50px;
+    display: inline-block;
+    border-radius: 100%;
+    border: 2px solid #fff;
+    overflow: hidden;
+    background-color: #fff;
+}
+.comments .add-comment .commenter-name {
+    width: 100%;
+    padding-left: 75px;
+    position: absolute;
+    top: 20px;
+    left: 0px;
+}
+
+.comments .add-comment input {
+    border-top: 0px;
+    border-bottom: 1px solid #ccc;
+    border-left: 0px;
+    border-right: 0px;
+    outline: 0px;
+    box-shadow: none;
+    border-radius: 0;
+    width: 100%;
+    padding: 0;
+    font-weight: normal;
+}
+.comments .add-comment input:focus {
+    border-color: #03a9f4;
+    border-width: 2px;
+}
+.comments .add-comment button[type=submit] {
+    background-color: #03a9f4;
+    color: #fff;
+    margin-right: 0px;
+}
+
+/*======Responsive CSS=======*/
+@media (max-width: 767px){
+.comments .commenter-name {
+    font-size: 13px;
+    top: -5px;
+}
+.comments .commenter-pic {
+    width: 40px;
+    height: 40px;
+}
+.comments .commenter-name a{
+  display: block;
+}
+.comments .commenter-name .comment-time{
+  display: block;
+  margin-left: 0px;
+}
+}
+</style>
+
+<script>
+// Reply box popup JS
+$(document).ready(function(){
+  $(".reply-popup").click(function(){
+    $(".reply-box").toggle();
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+<!-- CSS Of Doctors detail-->
+<style type="text/css">
+/*CSS OF PAgination Buttons */
+.post-pagination{
+  display:block;
+  text-align: center;
+}
+#pagibtn{
+  color:rgb(0, 0, 0);
+  padding:5px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+
+/*DOCTOR DETAIL for desktop */
+@media(min-width:450px) and (max-width:3000px){
+.ts{
+  display:block;
+  height:auto;
+  width:110%;
+  margin-left:-5%;
+  margin-top: -15px;
+  background: rgb(255, 253, 253);
+  border-width: 1px;
+  border-color: rgb(199, 199, 199);
+  border-style:solid;
+
+  }
+
+.imagebox{
+  height:100px;
+  width: 100px;
+  background-color: rgb(33, 33, 41);
+  float: left;
+  margin-top: 20px;
+}
+
+.image{
+height:100px;
+width:100px;
+
+}
+
+.detailspage{
+  margin-left:150px;
+
+}
+
+.name{
+color:rgb(0, 0, 0);
+font-size: 20px;
+font-weight: 600;
+font-family: Arial;
+}
+
+.speciality{
+  font-size: 20px;
+  font-weight: 500;
+  color: rgb(2, 2, 2);
+
+}
+.experience{
+  margin-top:-15px;
+  color: rgb(0, 0, 0);
+  font-size: 1rem;
+  font-weight:500;
+
+}
+.about{
+  margin-top:-15px;
+  color: rgb(0, 0, 0);
+  font-size: 3%;
+}
+
+.timing{
+margin-top:-53px;
+margin-left:-150px;
+font-weight: 500;
+}
+.storeno{
+font-size: .9rem;
+font-weight: 500;
+margin-left: 73%;
+}
+
+.address{
+  font-size:15px;
+  margin-top:-15px;
+  margin-left:-145px;
+
+}
+.fees{
+  font-size: 15px;
+  margin-top:-15px;
+  margin-left:-145px;
+}
+.treatment{
+float:left;
+}
+}
+
+/*DOCTOR DETAIL for mobile  */
+
+@media(max-width:450px){
+
+/*--Header--*/
+.top{
+  height:50px;
+  padding-top:0px;
+}
+
+.ts{
+
+  display:block;
+  height:220px;
+  width:auto;
+  margin-left: -10%;
+  margin-top: -15px;
+ }
+
+.imagebox{
+  height:100px;
+  width: 100px;
+  background-color: rgb(33, 33, 41);
+  float: left;
+  margin-top: 10px;
+  
+  margin-right: 20px;
+}
+
+.image{
+  height:100px;
+  width: 100px;
+}
+
+.detailspage{
+  margin-left:85px;
+}
+
+.name{
+color:rgb(0, 0, 0);
+font-size: 1rem;
+font-weight: 800;
+}
+
+.speciality{
+  font-size: .9rem;
+  font-weight: 700;
+  color: rgb(2, 2, 2);
+
+}
+.experience{
+  color: rgb(0, 0, 0);
+  font-size: .9rem;
+  font-weight:600;
+  margin-top: -15px;
+
+}
+.about{
+  color: rgb(0, 0, 0);
+  font-size: 10px;
+  margin-top: -15px;
+}
+
+.storeno{
+
+font-size: 15px;
+font-weight: 800;
+
+margin-top: -18px;
+}
+
+.timing{
+font-size: 15px;
+font-weight: 500;
+
+margin-left: -60px;
+margin-top: -15px;
+}
+
+.address{
+margin-top: -10px;
+margin-left: -60px;
+
+font-size: 15px;
+font-weight: 500;
+}
+.fees{
+  font-size: 15px;
+  font-weight: 500;
+
+margin-top: -20px;
+margin-left: -60px;
+}
+}
+  </style>
+
+
+<!-- CSS OF TABLE-->
+<STYLE type="text/css">
+
+/* Time  Table  for desktop */
+@media(min-width:450px) and (max-width:3000px){
+.container-result{
+padding-left: 2%;
+padding-right: 2%;
+
+padding-top: 1%;
+font:normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+color:#000000;
+background: #E6EAE9;
+}
+
+td {
+    border-right: 0px solid #C1DAD7;
+    border-bottom: 2px solid #C1DAD7;
+    background: #fff;
+    padding: 6px 6px 6px 12px;
+
+}
+
+.f1{
+    padding-left: 20px;
+    width:8rem;
+    font-size: 1rem;
+    font-weight: 800;
+}
+.f2{
+    width:20rem;
+    padding-left: 0px;
+    font-size: 1rem;
+    font-weight: 800;
+}
+.f3{
+    width:20rem;
+    padding-left: 0px;
+    font-size: 1rem;
+    font-weight: 800;
+}
+.f4{
+  width:15rem;
+  padding-left: 0px;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.c1{
+  padding-left: 20px;
+  height:3rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.c2{
+padding-left: 0px;
+font-size: 20px;
+font-weight: 800;
+}
+.c2 a{
+color:rgb(0, 0, 0);
+}
+.c3{
+padding-left: 0px;
+font-size: 20px;
+font-weight: 700;
+}
+.c3 a{
+color:rgb(26, 26, 27);
+}
+
+.c4{
+padding-left: 10px;
+font-size: 20px;
+font-weight: 700;
+}
+
+}
+
+/*TABLE for mobile  */
+@media(max-width:450px){
+
+.container-result{
+padding-left: 1%;
+padding-right: 1%;
+height: auto;
+
+padding-top: 1%;
+font:normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+color:#000000;
+background: #E6EAE9;
+}
+.container-result h4{
+  font-size: 17px;
+}
+
+td {
+      border-right: 0px solid #C1DAD7;
+      border-bottom: 2px solid #C1DAD7;
+      background: #fff;
+      padding: 6px 6px 6px 6px;
+      color: #4f6b72;
+}
+.f1{
+      width:5%;
+      padding-left: 2px;
+      font-size: 1vw;
+      font-weight:700;
+  }
+.f2{
+      width:40%;
+      padding-left: 1px;
+      font-size: 1vw;
+      font-weight:700;
+  }
+  .f3{
+    width:40%;
+    font-size:.9vw;
+    font-weight:700;
+  }
+  .f4{
+    width:20%;
+    font-size: 1vw;
+    font-weight:700;
+    padding-left: 0px;
+  }
+
+  .c1{
+  padding-left: 1px;
+  font-size: 1rem;
+  font-weight: 800;
+  }
+
+  .c2{
+  padding-left: 1px;
+  font-size: 1vw;
+  font-weight: 800;
+  }
+  .c2 a{
+  color:rgb(26, 26, 27);
+  }
+.c3{
+  font-size: 1vw;
+  font-weight: 500;
+}
+.c3 a{
+  color:rgb(26, 26, 27);
+  }
+  .c4{
+  padding-left: 0px;
+  font-size: 1vw;
+  font-weight: 500;
+  }
+}
+</style>
+
+
+
+
+
+
+<!-- Footer     --------->
+<hr/>
+<div class="footer-container-page">
+    <section class="footer-page">
+      <div class="footerlinks-page" >
+         <a href="{% url 'about' %}"> About Us</a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}"> Contact </a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}">Add Your Clinic/Hospital</a>
+     </div>
+
+    </section>
+
+    <div class="socialcontainer-page">
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/facebook.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/instagram.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/twitter.png' %}" /></a>
+    </div>
+
+    <main class="lastline-page">
+     <span class="credit"> <a href="{% url 'home' %}">EVE </a>|</span>
+       <img class="socialmedia" id="copyright" src="{% static 'images/copyright.png' %}" />
+       2021 All rights reserved.
+    </main>
+
+</div>
+
+<!--Css Of Footer-->
+<style type="text/css">
+
+/* for desktop */
+@media(min-width:300px) and (max-width:3000px){
+  .footer-container-page{
+    display:block;
+    text-align:center;
+   }
+  .footer-page{
+    justify-content:center;
+    display:flex;
+  }
+  .footerlinks-page{
+    padding-left:40px;
+
+  }
+  .footerlinks-page a{
+    color:rgb(153, 153, 153);
+    font-size: xx-small;
+  }
+  .socialmedia-page{
+    height:20px;
+    width:50px;
+    padding-left:30px;
+  }
+  .lastline-page a{
+    font-size: 15px;
+    color:#000000;
+  }
+  .lastline-page{
+    font-size: xx-small;
+    color:#929292;
+  }
+  #copyright{
+    height:15px;
+    width:15px;
+  }
+}
+
+
+  /*Footer-page for mobile  */
+
+  @media(max-width:300px){
+  .footer-container-page{
+    display:block;
+    text-align:center;
+   }
+  .footer-page{
+    justify-content:center;
+    display:flex;
+  }
+  .footerlinks-page{
+    padding-left:10px;
+
+  }
+  .footerlinks-page a{
+    color:rgb(153, 153, 153);
+    font-size: xx-small;
+  }
+  .socialmedia-page{
+    height:20px;
+    width:50px;
+    padding-left:30px;
+  }
+  .lastline-page a{
+    font-size: 15px;
+    font-weight: 700;
+    color:#080808;
+  }
+  .lastline-page{
+    font-size: xx-small;
+    color:#929292;
+  }
+  #copyright{
+    height:15px;
+    width:15px;
+  }
+}
+</style>
+<!--End Of Footer-for-page-->
+
+
+{% endblock %}

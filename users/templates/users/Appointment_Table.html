@@ -1,0 +1,99 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+
+<!-- Header   Of Home page -->
+<div class="top">
+  <!-- This is the Menu (Hamburger menu) which was showing on the top-->
+    <nav role="navigation">
+        <div class="logo" ><a href="{% url 'home' %}" style="color:black;">EVE</a></div>
+ <!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+      <div id="menuToggle">
+      <input type="checkbox" />
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+       <div id="profile">
+           <a  href="{% url 'profile' %}"><li>
+             <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+             <p>Hello, {{ user.profile.your_name }}</p></li></a>
+       </div>
+
+           <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+           <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+<hr/>       {% if user.is_authenticated %}
+          <a href="{% url 'appointments' %}"><li>Appointments</li></a><hr/>
+          <a href="{% url 'profile' %}"><li>Profile</li></a><hr/>
+           <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+          {% else %}
+           <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+           <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+          {% endif %}
+      </ul>
+     </div>
+    </nav>
+</div>
+<!--End Of Header -->
+
+
+
+  <div class="content-section">
+    <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+       <legend class="border-bottom mb-4" >Update Your Appointment</legend>
+     <div class="formcontainer">
+       {{ form|crispy }}
+       <button class="createbtn"  type="submit" >Update</button>
+    </div>
+
+    </form>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+.asteriskField{
+    display:none;
+}
+
+.content-section{
+    overflow: hidden;
+    display:flex;
+    justify-content:center;
+    background-color: rgb(243, 243, 243);
+}
+/*
+
+.form-group{
+
+    width:200px;
+}
+
+.createbtn{
+    margin-bottom: 30px;
+    margin-right: 30px;
+    font-size: 20px;
+    font-weight: 500;
+    padding-left:20px;
+    padding-right: 20px;
+    border-radius: 1rem;
+    background-color: rgb(255, 255, 255);
+}
+
+</style>
+
+{% endblock %}

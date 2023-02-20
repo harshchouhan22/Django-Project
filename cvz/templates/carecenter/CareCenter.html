@@ -1,0 +1,211 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+
+<!-- Header   Of Home page -->
+<div class="Entire-Header">
+  <nav role="navigation">
+      <div class="logo" ><a href="{% url 'home' %}" >EVE</a>
+      <p>Receptionists</p>
+      </div>
+
+<!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+    <div id="menuToggle">
+    <input type="checkbox" />
+    <span></span>
+    <span></span>
+    <span></span>
+    <ul id="menu">
+     <div id="profile">
+         <a  href="{% url 'CareCenter_as_user_profile' %}"><li>
+           <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+          <p>Hello, {{ user.carecenter.receptionists_name }}</p></li></a>
+     </div>
+         <a href="{% url 'home' %}"><li>Home</li></a>
+
+<hr/>       {% if user.is_authenticated %}
+
+        <a href="{% url 'CareCenter_as_user_profile' %}"><li>Center Profile</li></a><hr/>
+         <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+         <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+        {% else %}
+
+         <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+         <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+        {% endif %}
+    </ul>
+   </div>
+  </nav>
+</div>
+
+
+
+<style type="text/css">
+
+  .Entire-Header{
+     height:40px;
+  }
+  /* start of logo  */
+  /* logo For Mobile  */
+  @media(max-width:450px){
+  .logo{
+    text-align: center;
+    font-size: 1.7rem;
+    font-weight:800;
+    padding-top: 0px;
+    font-weight:1000px;
+  }
+  /* Start of hamburger menu */
+  #menuToggle
+  {
+    display: fixed;
+    position: relative;
+    top: -8px;
+    left: 10px;
+    z-index: 1;
+    color:rgb(240, 226, 226);
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  #menu{display:block;
+      width:80%;
+      height:600px;
+    }
+  }
+  /* Logo For Desktop */
+  @media(min-width:450px) and (max-width:3000px){
+  .logo{
+    display:block;
+    font-size:25px;
+    font-weight:500;
+    text-align: left;
+    padding-left: 50px;
+    padding-top:0px;
+    }
+  
+  /* end of logo */
+  
+  /* Start of hamburger menu */
+  #menuToggle
+  {
+    display: fixed;
+    position: relative;
+    top: -8px;
+    left: 10px;
+    z-index: 1;
+    color:rgb(240, 226, 226);
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  /* End Of Hamburger Menu */
+  }
+  </style>
+<!--Header  Ends-->
+
+
+<legend class="border-bottom mb-4">Profile Info Present/Abb-{{ user.doctor.onn_off }}</legend>
+    <div class="content-section">
+       <div class="media">
+         <img  src="{{ user.carecenter.image.url }}">
+       </div>
+        <div class="doctor-detail">
+
+            <p  class="dr_name"> <b>Receptionists Name:{{ user.carecenter.receptionists_name }}</b></p>
+            <p  class="speciality"><b>No. Of Employee In Center:{{ user.carecenter.no_of_employees }}</b></p>
+            <p  class="experience">Center Address:{{ user.carecenter.center_address }}</p>
+            <p  class="about">Registered Date:{{ user.carecenter.date_registered }}</p>
+            <p  class="timing"><b>Center Contact:{{ user.carecenter.center_contact }}</b></p>
+            <p  class="fee">Center No.<b>{{ user.carecenter.storeno }}</b></p>
+            <p  class="storeno">Doctor-<b>{{ user.carecenter.doctor1 }}</b></p>
+            <p  class="storeno">Doctor-<b>{{ user.carecenter.doctor3 }}</b></p>
+
+        </div>
+    </div>
+
+<!-- Search bar For Table's-->
+    <form method="get" action="/appointmentsearch">
+        <div class="wrapper">
+          <div class="search-input">
+            <input type="text" placeholder="Search by date" name="query" id="query" >
+            <button id="searchicon" class="icon" onclick="/appointmentsearch" type="submit" ><img src="{% static 'images/search.svg' %}"/></button>
+          </div>
+        </div>
+    </form>
+<hr/>
+
+ <H4>Doctor</H4>
+      {% for doctor in doctor %}
+        <TD class="c1"><a href="{% url 'Appointment_Table_For_carecenter' doctor.id %}">{{ doctor.CareCenter }}</a></TD>
+        <TD class="c2">{{ doctor.First_Name }} {{ table2s.Last_Name }}</TD>
+        <TD class="c3">{{ doctor.id }}</TD>
+        {% endfor %}
+
+<div class="doctor-2">
+    <H1><p  class="storeno">Doctor}ji</p></H1>
+     <H4>Appointments Of Dr.{{ object.name }} ({{ page_obj.paginator.count }})</H4>
+  <TABLE class="flayout" >
+    <TR>
+        <TD id="topelement" class="f1">No.</TD>
+        <TD id="topelement" class="f2">Patient Name</TD>
+        <TD id="topelement" class="f3">Timing</TD>
+        <TD id="topelement" class="f4">Date</TD>
+    </TR>
+      {% for appointments_booked in appointments_booked %}
+    <TR >
+        <TD class="c1">{{ appointments_booked.no }}</TD>
+        <TD class="c2"><a  href="{% url 'Table1_detail' appointments_booked.id %}">{{ appointments_booked.First_Name }} {{ appointments_booked.Last_Name }}</a></TD>
+        <TD class="c3"><a  href="{% url 'Appointment_Table_update' appointments_booked.id %}">{{ appointments_booked.start_time|date:'H:i A' }}-{{ appointments_booked.end_time|date:'H:i A' }}</a></TD>
+        <TD class="c4">{{ appointments_booked.appointment_date|date:'jS F Y' }}</TD>
+        <TD class="c5">{{ appointments_booked.mode }}</TD>
+
+    </TR>
+      {% endfor %}
+      {% for event in event %}
+    <TR>
+        <TD class="c1">{{ event.no }}</TD>
+        <TD class="c2"><a href="{% url 'Table1_in_carecenter_form'  %}">Available </a></TD>
+        <TD class="c3">{{ event.start_time|date:'H:i A' }}-{{ event.end_time|date:'H:i A' }}</TD>
+        <TD class="c4">{{ event.appointment_date|date:'jS F Y' }}</TD>
+        {% endfor %}
+     </TR>
+        </TABLE>
+</div>
+
+
+
+
+
+<div class="post-pagination">
+      {% if is_paginated %}
+
+      {% if page_obj.has_previous %}
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a id="pagibtn" class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a id="pagibtn" class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+      {% endif %}
+    {% endif %}
+</div>
+
+
+<!-- Appointment Table-->
+
+<h4><a class="btn btn-primary" href="archive_day">Appointments of Today</a></h4>
+
+<h4><a class="btn btn-primary"  href="Table1_form">Create An Appointment</a></h4>
+
+
+{% endblock %}

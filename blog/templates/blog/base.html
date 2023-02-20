@@ -1,0 +1,138 @@
+{% load static %}
+
+<html >
+<!-- To declare your language - read more here: https://www.w3.org/International/questions/qa-html-language-declarations -->
+<head>
+    <link rel="shortcut icon" href="{% static 'images/title_bar_image.ico' %}" />
+    <title>EVE</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href= "{% static 'headercss.css' %}" rel="stylesheet" type="text/css" media="all">
+<link href= "{% static 'middlepart.css' %}" rel="stylesheet" type="text/css" media="all">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+
+
+
+
+<body>
+  {% for message in messages  %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <strong>Message : </strong> {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+      {% endfor %}
+
+       {% block body %}{% endblock %}
+<!-- messages -->
+
+{% if messages %}
+  {% for messages in messages %}
+  <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+  </div>
+  {% endfor %}
+{% endif %}
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+{% block js %} {% endblock %}
+
+
+
+<style>
+
+
+  /* for desktop */
+  @media(min-width:500px) and (max-width:3000px){
+    .footer-container-page{
+      display:block;
+      text-align:center;
+     }
+    .footer-page{
+      justify-content:center;
+      display:flex;
+    }
+    .footerlinks-page{
+      padding-left:40px;
+
+    }
+    .footerlinks-page a{
+      color:rgb(153, 153, 153);
+      font-size: xx-small;
+    }
+    .socialmedia-page{
+      height:20px;
+      width:50px;
+      padding-left:30px;
+    }
+    .lastline-page a{
+      font-size: 15px;
+      color:#000000;
+    }
+    .lastline-page{
+      font-size: xx-small;
+      color:#929292;
+    }
+    #copyright{
+      height:15px;
+      width:15px;
+    }
+  }
+
+
+    /*Footer-page for mobile  */
+
+    @media(max-width:500px){
+
+    .footer-container-page{
+      display:block;
+      text-align:center;
+
+
+     }
+    .footer-page{
+      justify-content:center;
+      display:flex;
+    }
+    .footerlinks-page{
+      padding-left:10px;
+
+    }
+    .footerlinks-page a{
+      color:rgb(153, 153, 153);
+      font-size: xx-small;
+    }
+    .socialmedia-page{
+      height:20px;
+      width:50px;
+      padding-left:30px;
+    }
+    .lastline-page a{
+      font-size: 15px;
+      font-weight: 700;
+      color:#000000;
+    }
+    .lastline-page{
+      font-size: xx-small;
+      color:#929292;
+    }
+    #copyright{
+      height:15px;
+      width:15px;
+    }
+  }
+</style>
+
+
+</body>
+</html>

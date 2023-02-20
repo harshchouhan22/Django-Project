@@ -1,0 +1,278 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+<!-- Header   Of Home page -->
+<div class="Entire-Header">
+  <!-- This is the Menu (Hamburger menu) which was showing on the top-->
+    <nav role="navigation">
+        <div class="logo" ><a href="{% url 'home' %}" style="color:black;">EVE</a></div>
+ <!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+      <div id="menuToggle">
+      <input type="checkbox" />
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+       <div id="profile">
+           <a  href="{% url 'profile' %}"><li>
+             <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+             <p>Hello, {{ user.profile.your_name }}</p></li></a>
+       </div>
+
+           <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+           <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+<hr/>       {% if user.is_authenticated %}
+          <a href="{% url 'appointments' %}"><li>Appointments</li></a><hr/>
+          <a href="{% url 'profile' %}"><li>Profile</li></a><hr/>
+           <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+          {% else %}
+           <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+           <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+          {% endif %}
+      </ul>
+     </div>
+    </nav>
+</div>
+
+<style>
+/* Logo For Desktop */
+@media(min-width:450px) and (max-width:3000px){
+.Entire-Header{
+  height:40px;
+}
+
+.logo{
+  display:block;
+  font-size:25px;
+  font-weight:700;
+  text-align: left;
+  padding-left: 50px;
+  padding-top:0px;
+  }
+#menuToggle
+{
+  display: fixed;
+  position: relative;
+  top: -8px;
+  left: 10px;
+  z-index: 1;
+  color:rgb(240, 226, 226);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+}
+  /* For Mobile */
+  @media(max-width:450px){
+  .Entire-Header{
+    height:40px;
+  }
+  
+  .logo{
+    display:block;
+    font-size:1.8rem;
+    font-weight:600;
+    }
+  #menuToggle
+  {
+    display: fixed;
+    position: relative;
+    top: -10px;
+    left: 10px;
+    z-index: 1;
+    color:rgb(240, 226, 226);
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  }
+  </style>
+<!--End Of Header -->
+
+
+
+    <div class="back-container">
+        <div class="container-fluid front-container">
+            <div class="back-top"></div>
+            <div class="back-main"></div>
+        </div>
+        <div class="container front-container1">
+            <div class="row chat-top">
+                <div class="col-sm-4 border-right border-secondary">
+                    <img src="{% static 'assets/dp.png' %}" alt="" class="profile-image rounded-circle">
+                    <span class="ml-2">You</span>
+                    <span class="float-right mt-2">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-circle" fill="currentColor"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                        </svg>
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chat-left-fill mx-3"
+                            fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        </svg>
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical mr-2"
+                            fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                        </svg>
+                    </span>
+    
+    
+                </div>
+                <div class="col-sm-8">
+                    <img src="{% static 'assets/dp.png' %}" alt="" class="profile-image rounded-circle">
+                    <span class="ml-2"><H5>{{user.First_Name}} {{user.Last_Name}}{{user.doctor.First_Name}} {{user.doctor.Last_Name}} </H5></span>
+                    <span class="float-right" >
+                        {% if user.is_authenticated and user.is_doctor %}
+                           <a class="btn " href="{% url 'video_call' request.user.id %}" >Video call</a>
+                        {% else %}
+                            <H1><a class="btn " href="{% url 'video_call' user.id %}" >Video call</a></H1> 
+                        {% endif %}
+                    </span>
+                    <span class="float-right mt-2">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z" />
+                            <path fill-rule="evenodd"
+                                d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z" />
+                        </svg>
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical mx-3"
+                            fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 contacts">
+                    <div class="contact-table-scroll">
+                        <table class="table table-hover">
+                            <tbody>
+    
+    
+                                <!-- end -->
+                            </tbody>
+                        </table>
+                    </div>
+    
+                </div>
+                <div class="col-sm-8 message-area">
+                    <div class="message-table-scroll">
+                        <table class="table">
+                            <tbody id='chat-body'>
+                                {% for message in messages %}
+                                {% if message.sender == request.user.First_Name %}
+                                <tr>
+                                    <td>
+                                        <p class="bg-success p-2 mt-2 mr-5 shadow-sm text-white float-right rounded">
+                                           {{message.message}}
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p><small class="p-1 shadow-sm">{{message.timestamp|time:'H:i'}}</small>
+                                        </p>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td>
+                                        <p class="bg-primary p-2 mt-2 mr-5 shadow-sm text-white float-left rounded">
+                                            {{message.message}}
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p><small class="p-1 shadow-sm">{{message.timestamp|time:'H:i'}}</small>
+                                        </p>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row message-box p-3">
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="message_input" placeholder="Write message...">
+    
+                        </div>
+                        <div class="col-sm-2 mt-1">
+                            <div class="control">
+                                <button class="btn btn-success" id="chat-message-submit">Submit</button>
+                            </div>
+                        </div>
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+{{user.id|json_script:"json-username"}}
+{{request.user.email|json_script:"json-message-username"}}
+
+<script>
+
+
+const id = JSON.parse(document.getElementById('json-username').textContent);
+const message_username = JSON.parse(document.getElementById('json-message-username').textContent);
+
+const socket = new WebSocket(
+   'ws://' + window.location.host + '/chatPage/'   + id    + '/'
+);
+
+socket.onopen = function(e){
+    console.log("CONNECTION ESTABLISHED");
+}
+
+socket.onclose = function(e){
+    console.log("CONNECTION LOST");
+}
+
+socket.onerror = function(e){
+    console.log("ERROR OCCURED");
+}
+
+socket.onmessage = function(e){
+    const data = JSON.parse(e.data);
+    if(data.username == message_username){
+        document.querySelector('#chat-body').innerHTML += `<tr>
+                                                                <td>
+                                                                <p class="bg-success p-2 mt-2 mr-5 shadow-sm text-white float-right rounded">${data.message}</p>
+                                                                </td>
+                                                            </tr>`
+    }else{
+        document.querySelector('#chat-body').innerHTML += `<tr>
+                                                                <td>
+                                                                <p class="bg-primary p-2 mt-2 mr-5 shadow-sm text-white float-left rounded">${data.message}</p>
+                                                                </td>
+                                                            </tr>`
+    }
+}
+
+document.querySelector('#chat-message-submit').onclick = function(e){
+    const message_input = document.querySelector('#message_input');
+    const message = message_input.value;
+
+    socket.send(JSON.stringify({
+        'message':message,
+        'username':message_username
+    }));
+
+    message_input.value = '';
+}
+</script>
+
+
+
+
+
+
+
+  
+{% endblock %}

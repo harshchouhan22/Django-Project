@@ -1,0 +1,428 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block title %} Search Results {% endblock title %}
+
+{% block blogactive %} active {% endblock blogactive %}
+
+{% block body %}
+
+
+<!-- Header   Of Home page -->
+
+<div class="Entire-Header">
+     <nav role="navigation">
+         <div class="logo" ><a href="{% url 'home' %}">EVE</a></div>
+  <!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+       <div id="menuToggle">
+       <input type="checkbox" />
+       <span></span>
+       <span></span>
+       <span></span>
+       <ul id="menu">
+        <div id="profile">
+            <a  href="{% url 'profile' %}"><li>
+              <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+              <p>Hello, {{ user.profile.your_name }}</p></li></a>
+        </div>
+
+            <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+            <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+<hr/>       {% if user.is_authenticated %}
+           <a href="{% url 'appointments' %}"><li>Appointments</li></a><hr/>
+           <a href="{% url 'profile' %}"><li>Profile</li></a><hr/>
+            <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+           {% else %}
+            <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+            <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+           {% endif %}
+       </ul>
+      </div>
+     </nav>
+     <div class="searchform">  
+      <form method="get" action="/search">
+          <div class="wrapper">
+              <div class="search-input">
+              <a href=""  target="_blank" hidden></a>
+              <input type="text" placeholder="Make An Appoinment" name="query" id="query" >
+               <button id="searchicon" class="icon" onclick="/search" type="submit" ><img src="{% static 'images/search.svg' %}"/></button>
+              </div>
+          </div>
+      </form>
+     </div> 
+</div>
+
+
+<style>
+
+.Entire-Header{
+   height:50px;
+}
+
+
+
+.logo{
+  display:block;
+  font-size:25px;
+  font-weight:500;
+  text-align: left;
+  padding-left: 50px;
+  }
+
+.searchform{
+  margin-top: -45px;
+
+}
+/* For Mobile */
+@media(max-width:450px){
+.logo{
+  display:block;
+  font-size:30px;
+  font-weight:600;
+  text-align: left;
+  padding-left: 50px;
+  }
+
+.searchform{
+  margin-top: -55px;
+  width:70%;
+  margin-left: 100px;
+}
+}
+</style>
+
+<!--Header  Ends-->
+
+
+
+<div class="searchresults">
+    <p>Search results : </p>
+    {% if alldoctors|length < 1 %}
+    <p>No search results</p>
+    Your search query : <b>{{query}}</b> did not match any documents. <br>
+    Suggestions:
+    <ul>
+    <li>Make sure that all words are spelled correctly.</li>
+    <li>Try more general keywords.</li>
+    <li> Try fewer keywords.</li>
+    <li> Try different keywords.</li>
+    </li>
+    </ul>
+
+
+  <div class="container my-4">
+      <p>Search results : </p>
+      {% endif %}
+      {% for doctor in alldoctors %}
+  <a class="name" href="{% url 'doctors_profile_archive' doctor.id %}">
+    <div class="ts">
+    
+        <div class="imagebox">
+           <img src="{{doctor.image.url}}" class="image" >
+        </div>
+     
+        <div class="detailspage">
+      
+          <div> Dr. {{doctor.First_Name}} {{doctor.Last_Name}}</div>
+        
+          <div><p class="speciality">{{doctor.speciality}}</p></div>
+     
+
+          <div> <p class="timing">{{doctor.timing}}</p></div>
+          
+          <div><p class="address">{{doctor.CareCenter.Address|safe|truncatewords:"8"}}</p></div>
+          
+          <div><p class="storeno">-{{doctor.CareCenter.storeno}}</p></div>
+
+
+        </div>
+    </div>
+  </a>  
+</div>
+</div>
+    {% endfor %}
+
+
+<style type="text/css">
+
+.searchresults{
+padding-bottom: 10px;
+
+}
+.top{
+ 
+  padding-bottom: 0px;
+}
+
+/* for desktop */
+@media(min-width:450px) and (max-width:3000px){
+  .container p{
+  font-size: 2rem;
+  font-weight: 300;
+}
+  .ts{
+  display:block;
+  border-width: 1px;
+  border-style: solid;
+  border-radius:.1rem;
+  border-color: #bebebe;
+  height:auto;
+  margin-right:30px;
+  margin-left: 30px;
+  background: rgb(255, 255, 255);
+
+ }
+
+.imagebox{
+  float: left;
+  margin-top: 6px;
+}
+ 
+.image{
+height:100px;
+width:100px;
+border-radius:5rem; 
+}
+
+.detailspage{
+  padding-left: 130px;
+}
+.name{
+color:rgb(0, 0, 0);
+font-size: 20px;
+font-weight: 600;
+
+}
+.speciality{
+  font-size: 1.2rem;
+  font-weight:500;
+  color: rgb(2, 2, 2);
+ 
+}
+
+.timing{
+  font-size: 1rem;
+  font-weight:600;
+ margin-top: -20px;
+}
+
+.address{
+  font-size: 1rem;
+  font-weight:600;
+margin-top: -7px;
+margin-left: -30px;
+}
+.storeno{
+  font-size: 1rem;
+  font-weight:600;
+  margin-top: -35px;
+  margin-left: 80%;
+}
+}
+
+/* for mobile  */
+
+@media(max-width:450px){
+.container h4{
+  font-size: 1rem;
+}
+
+.ts{
+  display:block;
+  border-width: 1px;
+  border-style: solid;
+  border-radius:.1rem;
+  border-color: #bebebe;
+  height: 120px;
+  margin-right:10px;
+  margin-left: 10px;
+  background: rgb(255, 255, 255);
+
+ }
+
+.imagebox{
+  float: left;
+  margin-top: 6px;
+  height:75px;
+  width:75px;
+}
+ 
+.image{
+height:75px;
+width:75px;
+border-radius:5rem; 
+}
+
+.detailspage{
+  padding-left: 60px;
+}
+.name{
+color:rgb(0, 0, 0);
+font-size: 1.2rem;
+font-weight: 800;
+}
+.speciality{
+  font-size: 1rem;
+  font-weight:700;
+}
+
+.timing{
+  font-size: .8rem;
+  font-weight:600;
+ margin-top: -15px;
+}
+
+.address{
+  font-size: .8rem;
+  font-weight:600;
+margin-top: -8px;
+margin-left: -60px;
+}
+.storeno{
+  font-size: 1rem;
+  font-weight:600;
+  margin-top: -40px;
+  margin-left: 85%;
+}
+}
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Footer     --------->
+
+<div class="footer-container-page">
+    <section class="footer-page">
+      <div class="footerlinks-page" >
+         <a href="{% url 'about' %}"> About Us</a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}"> Contact </a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}">Add Your Clinic/Hospital</a>
+     </div>
+
+    </section>
+
+    <div class="socialcontainer-page">
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/facebook.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/instagram.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/twitter.png' %}" /></a>
+    </div>
+
+    <main class="lastline-page">
+     <span class="credit"> <a href="#">EVE </a>|</span>
+       <img class="socialmedia" id="copyright" src="{% static 'images/copyright.png' %}" /> 
+       2021 All rights reserved.
+    </main>
+
+</div>
+
+<!--Css Of Footer-->
+<style type="text/css">
+
+
+
+
+/* for desktop */
+@media(min-width:500px) and (max-width:3000px){
+  .footer-container-page{
+    display:block;
+    position: fixed;
+    bottom:0;
+	left: 0;
+    width: 100%;
+
+   }
+  .footer-page{
+    justify-content:center;
+
+  }
+  .footerlinks-page{
+    padding-left:40px;
+  }
+  .footerlinks-page a{
+    color:rgb(153, 153, 153);
+    font-size: xx-small;
+  }
+  .socialmedia-page{
+    height:20px;
+    width:50px;
+    padding-left:30px;
+  }
+  .lastline-page a{
+    font-size: 15px;
+    color:#000000;
+  }
+  .lastline-page{
+    font-size: xx-small;
+    color:#929292;
+  }
+  #copyright{
+    height:15px;
+    width:15px;
+  }
+}
+
+
+/*Footer-page for mobile  */
+
+@media(max-width:500px){
+.footer-container-page{
+display:block;
+text-align:center;
+display:block;
+position: fixed;
+bottom:0;
+}
+.footer-page{
+justify-content:center;
+display:flex;
+}
+.footerlinks-page{
+padding-left:10px;
+
+}
+.footerlinks-page a{
+color:rgb(153, 153, 153);
+font-size: xx-small;
+}
+.socialmedia-page{
+height:20px;
+width:50px;
+padding-left:30px;
+}
+.lastline-page a{
+font-size: 15px;
+font-weight: 700;
+color:#080808;
+}
+.lastline-page{
+font-size: xx-small;
+color:#929292;
+}
+#copyright{
+height:15px;
+width:15px;
+  }
+}
+</style>
+<!--End Of Footer-for-page-->
+
+
+{% endblock %}

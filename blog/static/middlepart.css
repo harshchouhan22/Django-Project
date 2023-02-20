@@ -1,0 +1,189 @@
+@charset "utf-8";
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+
+/* middle part of website   */
+
+/*css Of Middle Heading between sliders */
+
+  /*For  desktop Middle Headings */
+@media(min-width:500px) and (max-width:3000px){
+.headersection{
+	display:block;
+    background-color: rgb(216, 216, 216);
+    height:70px;
+  }
+.heading{
+    font-size: 1.5rem;
+    font-weight:700;
+    padding-left: 20px;
+  }
+.subtitle{
+    display:flex;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: -20px;
+    padding-left: 20px;
+  }
+}
+
+/* for mobile Middle Headings */
+
+@media(max-width:500px){
+.headersection{
+		display:block;
+		background-color: rgb(216, 216, 216);
+		height:55px;
+}
+
+.heading{
+		font-size: 1.4rem;
+		font-weight:800;
+		padding-left: 5px;
+}
+
+.subtitle{
+		display:flex;
+		font-size: 1rem;
+		font-weight: 500;
+		margin-top: -20px;
+		padding-left: 5px;
+}
+}
+/*End Of Header Of slider */
+
+
+
+
+/*Css Of Sliders */
+
+/*For  desktop Middle Headings */
+@media(min-width:500px) and (max-width:3000px){
+.slidercontainer{
+  display:block;
+  background-color: rgb(255, 255, 255);
+  height: 260px;
+
+  padding-top: 5px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+/* Whole First Slider */
+[class^="number-slide"],
+[class*=" number-slide"] {
+
+  height: 250px;
+  max-height: 100vh;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(173, 173, 173);
+}
+.imgbox{
+	height:150px;
+	display: flex;
+	justify-content: center;
+  }
+.imgdesc{
+  height:150px;
+  background-color: rgb(255, 255, 255);
+}
+.imgdesc p{
+font-size: 1rem;
+font-weight: 600;
+display: flex;
+}
+.imgdesc a{
+  font-size: 1.3rem;
+  font-weight: 800;
+  display: flex;
+  color:#a5a5a5;
+}
+
+
+.number-slide1 {
+}
+.number-slide2 {
+}
+.number-slide3 {
+
+}
+.number-slide4 {
+
+}
+.number-slide5 {
+
+}
+.number-slide6 {
+
+}
+
+}
+
+/*Css Of Sliders */
+
+/* for mobile Sliders */
+
+@media(max-width:500px){
+.slidercontainer{
+	background-color: #f0f0f0;
+	height: 200px;
+
+	padding-top: 5px;
+	padding-left: 4px;
+	padding-right: 4px;
+  }
+  /* Whole First Slider */
+  [class^="number-slide"],
+  [class*=" number-slide"] {
+
+	height: 190px;
+
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgb(173, 173, 173);
+  }
+  .imgbox{
+	  height:110px;
+	  display: flex;
+	  justify-content: center;
+	}
+  .imgdesc{
+	height:60px;
+	background-color: rgb(243, 243, 243);
+  }
+  .imgdesc a{
+	font-size: 1.2rem;
+	font-weight: 800;
+  display: flex;
+  color:#2e2d2d;
+  }
+  .imgdesc p{
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  }
+
+
+
+  .number-slide1 {
+  }
+  .number-slide2 {
+  }
+  .number-slide3 {
+  }
+  .number-slide4 {
+
+  }
+  .number-slide5 {
+
+  }
+  .number-slide6 {
+
+  }
+
+/* Second sliders last 2 boxes are disbled */
+#mobiledisable{
+    display:none;
+}
+
+}

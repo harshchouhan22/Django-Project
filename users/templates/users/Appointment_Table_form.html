@@ -1,0 +1,159 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+
+<!-- Header   Of Home page -->
+<div class="Entire-Header">
+  <!-- This is the Menu (Hamburger menu) which was showing on the top-->
+    <nav role="navigation">
+        <div class="logo" ><a href="{% url 'home' %}" style="color:black;">EVE</a></div>
+ <!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+      <div id="menuToggle">
+      <input type="checkbox" />
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+       <div id="profile">
+           <a  href="{% url 'profile' %}"><li>
+             <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+             <p>Hello, {{ request.user.First_Name }}</p></li></a>
+       </div>
+
+           <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+           <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+<hr/>       {% if user.is_authenticated %}
+
+           <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+          {% else %}
+           <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+           <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+          {% endif %}
+      </ul>
+     </div>
+    </nav>
+</div>
+
+<style>
+/* Logo For Desktop */
+@media(min-width:450px) and (max-width:3000px){
+.Entire-Header{
+  height:40px;
+}
+
+.logo{
+  display:block;
+  font-size:25px;
+  font-weight:700;
+  text-align: left;
+  padding-left: 50px;
+  padding-top:0px;
+  }
+
+
+}
+/* For Mobile */
+@media(max-width:450px){
+.Entire-Header{
+  height:40px;
+}
+.logo{
+  display:block;
+  font-size:1.8rem;
+  font-weight:600;
+  }
+}
+</style>
+<!--End Of Header -->
+
+
+  <div class="content-section">
+    <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+     
+     <div class="formcontainer">  
+      <p>Book An Appointment</p>
+           {{ form|crispy }}
+       <button  id="create-btn" class="btn btn-primary" type="submit" >Create</button>
+     </div>
+    </form>
+  </div>
+
+
+
+<style type="text/css">
+
+/* for desktop middle page */
+@media(min-width:450px) and (max-width:3000px){
+
+.asteriskField{
+  display:none;
+}
+
+.content-section{
+  overflow: hidden;
+  display:center;
+  text-align:center;
+}
+.formcontainer p{
+  font-size: 1.2rem;
+  font-weight:600;
+  display:center;
+  text-align:center;
+}
+
+.form-group{
+  margin-left: 20%;
+  width:300px;
+  margin-top: -22px;
+  display:center;
+  text-align:center;
+}
+}
+
+  /*for mobile  */
+  
+@media(max-width:450px){
+
+.asteriskField{
+  display:none;
+}
+
+.content-section{
+  display:center;
+  text-align:center;
+  margin:5%;
+  padding-bottom: 20px;
+}
+.formcontainer{
+  background-color: rgb(255, 255, 255);
+  border-color: rgb(194, 187, 187);
+  border-style: solid;
+  border-width: 1px;  
+  border-radius: 1px;
+  text-align:center;
+  height: 350px;
+  box-shadow: 0px 1px 5px 3px rgba(0, 0, 0, 0.12);  
+}
+.formcontainer p{
+  font-size: 1rem;
+  font-weight:500; 
+}
+.form-group{
+  padding-left: 50px;
+  width:250px;
+}
+#create-btn{
+  margin-top: 100px;
+}
+}
+
+</style>
+
+
+
+
+
+{% endblock %}

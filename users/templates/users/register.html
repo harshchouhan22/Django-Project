@@ -1,0 +1,234 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+<style type="text/css">
+#id_birth_date{
+  height:30px;
+
+}
+#id_your_name{
+  height:30px;
+
+}
+#id_username{
+  height:30px;
+}
+#id_email{
+  height:30px;
+}
+#id_password2{
+  height:30px;
+
+}
+#id_password1{
+  height:30px;
+
+}
+#hint_id_username{
+    display:none;
+}
+#hint_id_password2{
+    display:none;
+}
+body {
+    background: #fafafa;
+}
+    
+   
+/* for desktop */
+@media(min-width:450px) and (max-width:3000px){
+.content-section{
+        margin-top:-100px;
+        text-align: center;
+        color:rgb(0, 0, 0);
+        margin-left:35%;
+        height:500px;
+        width:300px;
+        border-style: solid;
+        border-radius: 1px;
+        border-width: 1px;
+        border-color:rgb(211, 211, 211);
+}
+.asteriskField{
+        display:none; 
+}    
+.login-header{
+        color:rgb(0, 0, 0);
+}
+.login-header H2{
+       font-size: 3rem;
+       font-weight: 800;
+       padding-left: 30px;
+}    
+.signup-field{
+      margin-top: -20px;
+}
+.form-group{
+        padding-left: 20px;
+        padding-right: 20px;
+        text-align: center;
+        display:center;
+        justify-content: center;    
+}
+}
+    
+/* for mobile  */
+@media(max-width:450px){
+.content-section{
+        margin-top:-10px;
+        text-align: center;
+        color:rgb(0, 0, 0);
+        margin-left:13%;
+        height:500px;
+        width:300px;
+        border-style: solid;
+        border-radius: 1px;
+        border-width: 1px;
+        border-color:rgb(211, 211, 211);
+        background-color: rgb(247, 247, 247);
+}
+.asteriskField{
+        display:none; 
+}    
+.login-header{
+        color:rgb(0, 0, 0);
+        text-align: center;
+}
+.login-header H2{
+       font-size: 3rem;
+       font-weight: 800;
+}    
+.login-header p{
+        margin-top:-15px;
+}
+.signup-field{
+    margin-top:-20px;      
+}
+.form-group{
+        padding-left: 20px;
+        padding-right: 20px;
+        text-align: center;
+        display:center;
+        justify-content: center;
+    
+}
+}
+</style>
+        
+    
+        <div class="login-header">
+            <H2>EVE</H2>
+            <p>Health Care Centers</p>
+        </div>
+    <div class="content-section">
+           <form method="POST" >
+                {% csrf_token %}
+              <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Sign Up</legend>
+                <div class="formfill">
+
+                    <div class="signup-field">
+                        {{ form.First_Name|as_crispy_field }}
+                    </div>
+
+                    <div class="signup-field">
+                        {{ form.Last_Name|as_crispy_field }}
+                    </div>
+                    <div class="signup-field">
+                        {{ form.phone_number|as_crispy_field }}
+                    </div>
+                    <div class="signup-field">
+                        {{ form.email|as_crispy_field }}
+                    </div>
+
+                    <div class="signup-field">
+                        {{ form.password1|as_crispy_field }}
+                    </div>
+                    <div class="signup-field">
+                        {{ form.password2|as_crispy_field }}
+                    </div>
+                    </div>
+              </fieldset>
+              <div class="form-group">
+                <button style="height:30px;  width:150px; margin-top:-20px;" class="btn btn-primary"  type="submit">Sign In</button>
+              </div>
+            </form>
+
+
+        <small class="text-muted1">
+                Already Have An Account? <a class="ml-2" href="{% url 'login' %}">Log In</a>
+            </small>
+    </div>
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    <!-- Footer     --------->
+    <hr/>
+    
+        <main class="lastline-page">
+         <span class="credit"> <a href="#">EVE </a>|</span>
+           <img class="socialmedia" id="copyright" src="{% static 'images/copyright.png' %}" />
+           2021 All rights reserved.
+        </main>
+    
+    </div>
+    <!--Css Of Footer-->
+    <style type="text/css">
+    
+      /* for desktop */
+      @media(min-width:450px) and (max-width:3000px){
+        .lastline-page a{
+          font-size: 15px;
+          color:#000000;
+        }
+        .lastline-page{
+          text-align:center;  
+          font-size: xx-small;
+          color:#929292;
+        }
+        #copyright{
+          height:15px;
+          width:15px;
+        }
+      }
+    
+    
+        /*Footer-page for mobile  */
+    
+        @media(max-width:450px){
+    
+    
+        .lastline-page{
+      
+          text-align:center;  
+          font-size: xx-small;
+          color:#929292;
+        }
+        .lastline-page a{
+          font-size: 15px;
+          color:#000000;
+        }
+        #copyright{
+          height:15px;
+          width:15px;
+        }
+      }
+      </style>
+{% endblock %}

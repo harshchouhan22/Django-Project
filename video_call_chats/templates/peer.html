@@ -1,0 +1,14 @@
+{% extends 'blog/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+     <script>
+        var numbTurnCredential = '{{numb_turn_credential}}';
+        var numbTurnUsername = '{{numb_turn_username}}';
+    </script>
+
+    <script type="text/javascript" src="{% static 'script1/peer.js' %}"></script>
+  <script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
+{% endblock %}

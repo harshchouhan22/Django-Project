@@ -1,0 +1,2133 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block body %}
+
+<!-- Header -->
+<div class="top">
+   <!-- This is the Menu (Hamburger menu) which was showing on the top-->
+     <nav role="navigation">
+         <div class="logo" ><a href="{% url 'home' %}" style="color:black;">EVE</a></div>
+  <!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+       <div id="menuToggle">
+       <input type="checkbox" />
+       <span></span>
+       <span></span>
+       <span></span>
+       <ul id="menu">
+        <div id="profile">
+            <a  href="{% url 'profile' %}"><li>
+              <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+              <P>Hello, {{ user.username }}</P></li></a>
+        </div>
+
+            <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+            <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+<hr/>           {% if user.is_authenticated %}
+
+            <a href="{% url 'profile' %}"><li>Profile</li></a><hr/>
+            <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+           {% else %}
+            <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+            <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+           {% endif %}
+       </ul>
+      </div>
+     </nav>
+</div>
+<!--End Of header -->
+
+
+<script src="https://unpkg.com/amazon-kinesis-video-streams-webrtc/dist/kvs-webrtc.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.585.0.min.js"></script>
+    <script src="https://unpkg.com/@ungap/url-search-params"></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+
+<div class="container mt-3">
+    <h1>KVS WebRTC Test Page</h1>
+    <p>This is the KVS Signaling Channel WebRTC test page. Use this page to connect to a signaling channel as either the MASTER or as a VIEWER.</p>
+
+    <div class="row loader"></div>
+    <div id="main" ><!--class="d-none"-->
+        <form id="form">
+            <h4>KVS Endpoint</h4>
+            <div class="form-group">
+                <label>Region</label>
+                <input type="text" class="form-control" id="region" value="us-west-2">
+            </div>
+            <div class="form-group">
+                <label>Endpoint <small>(optional)</small></label>
+                <input type="text" class="form-control" id="endpoint" placeholder="Endpoint">
+            </div>
+            <h4>AWS Credentials</h4>
+            <div class="form-group">
+                <label>Access Key ID</label>
+                <input type="text" class="form-control" id="accessKeyId" placeholder="Access key id">
+            </div>
+            <div class="form-group">
+                <label>Secret Access Key</label>
+                <input type="password" class="form-control" id="secretAccessKey" placeholder="Secret access key">
+            </div>
+            <div class="form-group">
+                <label>Session Token <small>(optional)</small></label>
+                <input type="password" class="form-control" id="sessionToken" placeholder="Session token">
+            </div>
+            <h4>Signaling Channel</h4>
+            <div class="form-group">
+                <label>Channel Name</label>
+                <input type="text" class="form-control" id="channelName" placeholder="Channel">
+            </div>
+            <div class="form-group">
+                <label>Client Id <small>(optional)</small></label>
+                <input type="text" class="form-control" id="clientId" placeholder="Client id">
+            </div>
+            <h4>Tracks</h4>
+            <p><small>Control which media types are transmitted to the remote client.</small></p>
+            <div class="form-group">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="sendVideo" value="video" checked>
+                    <label class="form-check-label">Send Video</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="sendAudio" value="audio">
+                    <label class="form-check-label">Send Audio</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="openDataChannel" value="datachannel">
+                    <label class="form-check-label">Open DataChannel</label>
+                </div>
+            </div>
+            <h4>Video Resolution</h4>
+            <p><small>Set the desired video resolution and aspect ratio.</small></p>
+            <div class="form-group">
+                <div class="form-check form-check">
+                    <input class="form-check-input" type="radio" name="resolution" id="widescreen" value="option1" checked>
+                    <label class="form-check-label" for="widescreen">1280x720 <small>(16:9 widescreen)</small></label>
+                </div>
+                <div class="form-check form-check">
+                    <input class="form-check-input" type="radio" name="resolution" id="fullscreen" value="option2">
+                    <label class="form-check-label" for="fullscreen">640x480 <small>(4:3 fullscreen)</small></label>
+                </div>
+            </div>
+            <h4>NAT Traversal</h4>
+            <p><small>Control settings for ICE candidate generation.</small></p>
+            <div class="form-group">
+                <div class="form-check form-check">
+                    <input class="form-check-input" type="radio" name="natTraversal" id="natTraversalEnabled" value="option2" checked>
+                    <label class="form-check-label" for="natTraversalEnabled">STUN/TURN</label>
+                </div>
+                <div class="form-check form-check">
+                    <input class="form-check-input" type="radio" name="natTraversal" id="forceTURN" value="option3">
+                    <label class="form-check-label" for="forceTURN">TURN Only <small>(force cloud relay)</small></label>
+                </div>
+                <div class="form-check form-check">
+                    <input class="form-check-input" type="radio" name="natTraversal" id="natTraversalDisabled" value="option1">
+                    <label class="form-check-label" for="natTraversalDisabled">Disabled</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="useTrickleICE" value="useTrickleICE" checked>
+                    <label class="form-check-label">Use trickle ICE <small>(not supported by Alexa devices)</small></label>
+                </div>
+            </div>
+            <div>
+                <button id="master-button" type="button" class="btn btn-primary">Start Master</button>
+                <button id="viewer-button" type="button" class="btn btn-primary">Start Viewer</button>
+                <button id="create-channel-button"  type="button" class="btn btn-primary">Create Channel</button>
+            </div>
+        </form>
+
+        <div id="master" class="d-none">
+            <h2>Master</h2>
+            <div class="row">
+                <div class="col">
+                    <h5>Master Section</h5>
+                    <div class="video-container"><video class="local-view" autoplay playsinline controls muted /></div>
+                </div>
+                <div class="col">
+                    <h5>Viewer Return Channel</h5>
+                    <div class="video-container"><video class="remote-view" autoplay playsinline controls /></div>
+                </div>
+            </div>
+            <div class="row datachannel">
+                <div class="col">
+                    <div class="form-group">
+                      <textarea type="text" class="form-control local-message" placeholder="DataChannel Message"> </textarea>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card bg-light mb-3">
+                        <pre class="remote-message card-body text-monospace preserve-whitespace"></pre>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span class="send-message datachannel">
+                  <button type="button" class="btn btn-primary">Send DataChannel Message</button>
+                </span>
+                <button id="stop-master-button" type="button" class="btn btn-primary">Stop Master</button>
+            </div>
+        </div>
+
+        <div id="viewer" class="d-none">
+            <h2>Viewer</h2>
+            <div class="row">
+                <div class="col">
+                    <h5>Return Channel</h5>
+                    <div class="video-container"><video class="local-view" autoplay playsinline controls muted /></div>
+                </div>
+                <div class="col">
+                    <h5>From Master</h5>
+                    <div class="video-container"><video class="remote-view" autoplay playsinline controls /></div>
+                </div>
+            </div>
+            <div class="row datachannel">
+                <div class="col">
+                    <div class="form-group">
+                      <textarea type="text" class="form-control local-message" placeholder="DataChannel Message"> </textarea>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card bg-light mb-3">
+                        <pre class="remote-message card-body text-monospace preserve-whitespace"></pre>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <span class="send-message datachannel" class="d-none">
+                  <button type="button" class="btn btn-primary">Send DataChannel Message</button>
+                </span>
+                <button id="stop-viewer-button" type="button" class="btn btn-primary">Stop Viewer</button>
+            </div>
+        </div>
+
+        <h3 id="logs-header">Logs</h3>
+        <div class="card bg-light mb-3">
+            <pre id="logs" class="card-body text-monospace preserve-whitespace"></pre>
+        </div>
+
+    </div>
+</div>
+
+<div id="test"></div>
+
+
+
+
+<link href= "{% static 'script/kvs-webrtc.js' %}" rel="stylesheet" type="text/javascript" media="all">
+<link href= "{% static 'script/master.js' %}" rel="stylesheet" type="text/javascript" media="all">
+<link href= "{% static 'script/viewer.js' %}" rel="stylesheet" type="text/javascript" media="all">
+<link href= "{% static 'script/createSignalingChannel.js' %}" rel="stylesheet" type="text/javascript" media="all">
+
+<link href= "{% static 'script/app.js' %}" rel="stylesheet" type="text/javascript" media="all">
+
+<link href= "{% static 'app.css' %}" rel="stylesheet" type="text/css" media="all">
+
+
+
+
+<script>
+let ROLE = null; // Possible values: 'master', 'viewer', null
+
+
+
+function configureLogging() {
+    function log(level, messages) {
+        const text = messages
+            .map(message => {
+                if (typeof message === 'object') {
+                    return JSON.stringify(message, null, 2);
+                } else {
+                    return message;
+                }
+            })
+            .join(' ');
+        $('#logs').append($(`<div class="${level.toLowerCase()}">`).text(`[${new Date().toISOString()}] [${level}] ${text}\n`));
+    }
+
+    console._error = console.error;
+    console.error = function(...rest) {
+        log('ERROR', Array.prototype.slice.call(rest));
+        console._error.apply(this, rest);
+    };
+
+
+
+    console._warn = console.warn;
+    console.warn = function(...rest) {
+        log('WARN', Array.prototype.slice.call(rest));
+        console._warn.apply(this, rest);
+    };
+
+    console._log = console.log;
+    console.log = function(...rest) {
+        log('INFO', Array.prototype.slice.call(rest));
+        console._log.apply(this, rest);
+    };
+}
+
+function getRandomClientId() {
+    return Math.random()
+        .toString(36)
+        .substring(2)
+        .toUpperCase();
+}
+
+function getFormValues() {
+    return {
+        region: $('#region').val(),
+        channelName: $('#channelName').val(),
+        clientId: $('#clientId').val() || getRandomClientId(),
+        sendVideo: $('#sendVideo').is(':checked'),
+        sendAudio: $('#sendAudio').is(':checked'),
+        openDataChannel: $('#openDataChannel').is(':checked'),
+        widescreen: $('#widescreen').is(':checked'),
+        fullscreen: $('#fullscreen').is(':checked'),
+        useTrickleICE: $('#useTrickleICE').is(':checked'),
+        natTraversalDisabled: $('#natTraversalDisabled').is(':checked'),
+        forceTURN: $('#forceTURN').is(':checked'),
+        accessKeyId: $('#accessKeyId').val(),
+        endpoint: $('#endpoint').val() || null,
+        secretAccessKey: $('#secretAccessKey').val(),
+        sessionToken: $('#sessionToken').val() || null,
+    };
+}
+
+function toggleDataChannelElements() {
+    if (getFormValues().openDataChannel) {
+        $('.datachannel').removeClass('d-none');
+    } else {
+        $('.datachannel').addClass('d-none');
+    }
+}
+
+function onStatsReport(report) {
+    // TODO: Publish stats
+}
+
+function onStop() {
+    if (!ROLE) {
+        return;
+    }
+
+    if (ROLE === 'master') {
+        stopMaster();
+        $('#master').addClass('d-none');
+    } else {
+        stopViewer();
+        $('#viewer').addClass('d-none');
+    }
+
+    $('#form').removeClass('d-none');
+    ROLE = null;
+}
+
+window.addEventListener('beforeunload', onStop);
+
+window.addEventListener('error', function(event) {
+    console.error(event.message);
+    event.preventDefault();
+});
+
+window.addEventListener('unhandledrejection', function(event) {
+    console.error(event.reason.toString());
+    event.preventDefault();
+});
+
+configureLogging();
+
+$('#master-button').click(async () => {
+    ROLE = 'master';
+    $('#form').addClass('d-none');
+    $('#master').removeClass('d-none');
+
+    const localView = $('#master .local-view')[0];
+    const remoteView = $('#master .remote-view')[0];
+    const localMessage = $('#master .local-message')[0];
+    const remoteMessage = $('#master .remote-message')[0];
+    const formValues = getFormValues();
+
+    $(remoteMessage).empty();
+    localMessage.value = '';
+    toggleDataChannelElements();
+
+    startMaster(localView, remoteView, formValues, onStatsReport, event => {
+        remoteMessage.append(`${event.data}\n`);
+    });
+});
+
+$('#stop-master-button').click(onStop);
+
+$('#viewer-button').click(async () => {
+    ROLE = 'viewer';
+    $('#form').addClass('d-none');
+    $('#viewer').removeClass('d-none');
+
+    const localView = $('#viewer .local-view')[0];
+    const remoteView = $('#viewer .remote-view')[0];
+    const localMessage = $('#viewer .local-message')[0];
+    const remoteMessage = $('#viewer .remote-message')[0];
+    const formValues = getFormValues();
+
+    $(remoteMessage).empty();
+    localMessage.value = '';
+    toggleDataChannelElements();
+
+    startViewer(localView, remoteView, formValues, onStatsReport, event => {
+        remoteMessage.append(`${event.data}\n`);
+    });
+});
+
+$('#stop-viewer-button').click(onStop);
+
+$('#create-channel-button').click(async () => {
+    const formValues = getFormValues();
+
+    createSignalingChannel(formValues);
+});
+
+$('#master .send-message').click(async () => {
+    const masterLocalMessage = $('#master .local-message')[0];
+    sendMasterMessage(masterLocalMessage.value);
+});
+
+$('#viewer .send-message').click(async () => {
+    const viewerLocalMessage = $('#viewer .local-message')[0];
+    sendViewerMessage(viewerLocalMessage.value);
+});
+
+// Read/Write all of the fields to/from localStorage so that fields are not lost on refresh.
+const urlParams = new URLSearchParams(window.location.search);
+const fields = [
+    { field: 'channelName', type: 'text' },
+    { field: 'clientId', type: 'text' },
+    { field: 'region', type: 'text' },
+    { field: 'accessKeyId', type: 'text' },
+    { field: 'secretAccessKey', type: 'text' },
+    { field: 'sessionToken', type: 'text' },
+    { field: 'endpoint', type: 'text' },
+    { field: 'sendVideo', type: 'checkbox' },
+    { field: 'sendAudio', type: 'checkbox' },
+    { field: 'widescreen', type: 'radio', name: 'resolution' },
+    { field: 'fullscreen', type: 'radio', name: 'resolution' },
+    { field: 'openDataChannel', type: 'checkbox' },
+    { field: 'useTrickleICE', type: 'checkbox' },
+    { field: 'natTraversalEnabled', type: 'radio', name: 'natTraversal' },
+    { field: 'forceTURN', type: 'radio', name: 'natTraversal' },
+    { field: 'natTraversalDisabled', type: 'radio', name: 'natTraversal' },
+];
+fields.forEach(({ field, type, name }) => {
+    const id = '#' + field;
+
+    // Read field from localStorage
+    try {
+        const localStorageValue = localStorage.getItem(field);
+        if (localStorageValue) {
+            if (type === 'checkbox' || type === 'radio') {
+                $(id).prop('checked', localStorageValue === 'true');
+            } else {
+                $(id).val(localStorageValue);
+            }
+            $(id).trigger('change');
+        }
+    } catch (e) {
+        /* Don't use localStorage */
+    }
+
+    // Read field from query string
+    if (urlParams.has(field)) {
+        paramValue = urlParams.get(field);
+        if (type === 'checkbox' || type === 'radio') {
+            $(id).prop('checked', paramValue === 'true');
+        } else {
+            $(id).val(paramValue);
+        }
+    }
+
+    // Write field to localstorage on change event
+    $(id).change(function() {
+        try {
+            if (type === 'checkbox') {
+                localStorage.setItem(field, $(id).is(':checked'));
+            } else if (type === 'radio') {
+                fields
+                    .filter(fieldItem => fieldItem.name === name)
+                    .forEach(fieldItem => {
+                        localStorage.setItem(fieldItem.field, fieldItem.field === field);
+                    });
+            } else {
+                localStorage.setItem(field, $(id).val());
+            }
+        } catch (e) {
+            /* Don't use localStorage */
+        }
+    });
+});
+
+// The page is all setup. Hide the loading spinner and show the page content.
+$('.loader').addClass('d-none');
+$('#main').removeClass('d-none');
+console.log('Page loaded');
+
+</script>
+
+
+<script>
+/**
+ * This file demonstrates the process of starting WebRTC streaming using a KVS Signaling Channel.
+ */
+const viewer = {};
+
+async function startViewer(localView, remoteView, formValues, onStatsReport, onRemoteDataMessage) {
+    viewer.localView = localView;
+    viewer.remoteView = remoteView;
+
+    // Create KVS client
+    const kinesisVideoClient = new AWS.KinesisVideo({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: formValues.endpoint,
+        correctClockSkew: true,
+    });
+
+    // Get signaling channel ARN
+    const describeSignalingChannelResponse = await kinesisVideoClient
+        .describeSignalingChannel({
+            ChannelName: formValues.channelName,
+        })
+        .promise();
+    const channelARN = describeSignalingChannelResponse.ChannelInfo.ChannelARN;
+    console.log('[VIEWER] Channel ARN: ', channelARN);
+
+    // Get signaling channel endpoints
+    const getSignalingChannelEndpointResponse = await kinesisVideoClient
+        .getSignalingChannelEndpoint({
+            ChannelARN: channelARN,
+            SingleMasterChannelEndpointConfiguration: {
+                Protocols: ['WSS', 'HTTPS'],
+                Role: KVSWebRTC.Role.VIEWER,
+            },
+        })
+        .promise();
+    const endpointsByProtocol = getSignalingChannelEndpointResponse.ResourceEndpointList.reduce((endpoints, endpoint) => {
+        endpoints[endpoint.Protocol] = endpoint.ResourceEndpoint;
+        return endpoints;
+    }, {});
+    console.log('[VIEWER] Endpoints: ', endpointsByProtocol);
+
+    const kinesisVideoSignalingChannelsClient = new AWS.KinesisVideoSignalingChannels({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: endpointsByProtocol.HTTPS,
+        correctClockSkew: true,
+    });
+
+    // Get ICE server configuration
+    const getIceServerConfigResponse = await kinesisVideoSignalingChannelsClient
+        .getIceServerConfig({
+            ChannelARN: channelARN,
+        })
+        .promise();
+    const iceServers = [];
+    if (!formValues.natTraversalDisabled && !formValues.forceTURN) {
+        iceServers.push({ urls: `stun:stun.kinesisvideo.${formValues.region}.amazonaws.com:443` });
+    }
+    if (!formValues.natTraversalDisabled) {
+        getIceServerConfigResponse.IceServerList.forEach(iceServer =>
+            iceServers.push({
+                urls: iceServer.Uris,
+                username: iceServer.Username,
+                credential: iceServer.Password,
+            }),
+        );
+    }
+    console.log('[VIEWER] ICE servers: ', iceServers);
+
+    // Create Signaling Client
+    viewer.signalingClient = new KVSWebRTC.SignalingClient({
+        channelARN,
+        channelEndpoint: endpointsByProtocol.WSS,
+        clientId: formValues.clientId,
+        role: KVSWebRTC.Role.VIEWER,
+        region: formValues.region,
+        credentials: {
+            accessKeyId: formValues.accessKeyId,
+            secretAccessKey: formValues.secretAccessKey,
+            sessionToken: formValues.sessionToken,
+        },
+        systemClockOffset: kinesisVideoClient.config.systemClockOffset,
+    });
+
+    const resolution = formValues.widescreen ? { width: { ideal: 1280 }, height: { ideal: 720 } } : { width: { ideal: 640 }, height: { ideal: 480 } };
+    const constraints = {
+        video: formValues.sendVideo ? resolution : false,
+        audio: formValues.sendAudio,
+    };
+    const configuration = {
+        iceServers,
+        iceTransportPolicy: formValues.forceTURN ? 'relay' : 'all',
+    };
+    viewer.peerConnection = new RTCPeerConnection(configuration);
+    if (formValues.openDataChannel) {
+        viewer.dataChannel = viewer.peerConnection.createDataChannel('kvsDataChannel');
+        viewer.peerConnection.ondatachannel = event => {
+            event.channel.onmessage = onRemoteDataMessage;
+        };
+    }
+
+    // Poll for connection stats
+    viewer.peerConnectionStatsInterval = setInterval(() => viewer.peerConnection.getStats().then(onStatsReport), 1000);
+
+    viewer.signalingClient.on('open', async () => {
+        console.log('[VIEWER] Connected to signaling service');
+
+        // Get a stream from the webcam, add it to the peer connection, and display it in the local view.
+        // If no video/audio needed, no need to request for the sources.
+        // Otherwise, the browser will throw an error saying that either video or audio has to be enabled.
+        if (formValues.sendVideo || formValues.sendAudio) {
+            try {
+                viewer.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                viewer.localStream.getTracks().forEach(track => viewer.peerConnection.addTrack(track, viewer.localStream));
+                localView.srcObject = viewer.localStream;
+            } catch (e) {
+                console.error('[VIEWER] Could not find webcam');
+                return;
+            }
+        }
+
+        // Create an SDP offer to send to the master
+        console.log('[VIEWER] Creating SDP offer');
+        await viewer.peerConnection.setLocalDescription(
+            await viewer.peerConnection.createOffer({
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true,
+            }),
+        );
+
+        // When trickle ICE is enabled, send the offer now and then send ICE candidates as they are generated. Otherwise wait on the ICE candidates.
+        if (formValues.useTrickleICE) {
+            console.log('[VIEWER] Sending SDP offer');
+            viewer.signalingClient.sendSdpOffer(viewer.peerConnection.localDescription);
+        }
+        console.log('[VIEWER] Generating ICE candidates');
+    });
+
+    viewer.signalingClient.on('sdpAnswer', async answer => {
+        // Add the SDP answer to the peer connection
+        console.log('[VIEWER] Received SDP answer');
+        await viewer.peerConnection.setRemoteDescription(answer);
+    });
+
+    viewer.signalingClient.on('iceCandidate', candidate => {
+        // Add the ICE candidate received from the MASTER to the peer connection
+        console.log('[VIEWER] Received ICE candidate');
+        viewer.peerConnection.addIceCandidate(candidate);
+    });
+
+    viewer.signalingClient.on('close', () => {
+        console.log('[VIEWER] Disconnected from signaling channel');
+    });
+
+    viewer.signalingClient.on('error', error => {
+        console.error('[VIEWER] Signaling client error: ', error);
+    });
+
+    // Send any ICE candidates to the other peer
+    viewer.peerConnection.addEventListener('icecandidate', ({ candidate }) => {
+        if (candidate) {
+            console.log('[VIEWER] Generated ICE candidate');
+
+            // When trickle ICE is enabled, send the ICE candidates as they are generated.
+            if (formValues.useTrickleICE) {
+                console.log('[VIEWER] Sending ICE candidate');
+                viewer.signalingClient.sendIceCandidate(candidate);
+            }
+        } else {
+            console.log('[VIEWER] All ICE candidates have been generated');
+
+            // When trickle ICE is disabled, send the offer now that all the ICE candidates have ben generated.
+            if (!formValues.useTrickleICE) {
+                console.log('[VIEWER] Sending SDP offer');
+                viewer.signalingClient.sendSdpOffer(viewer.peerConnection.localDescription);
+            }
+        }
+    });
+
+    // As remote tracks are received, add them to the remote view
+    viewer.peerConnection.addEventListener('track', event => {
+        console.log('[VIEWER] Received remote track');
+        if (remoteView.srcObject) {
+            return;
+        }
+        viewer.remoteStream = event.streams[0];
+        remoteView.srcObject = viewer.remoteStream;
+    });
+
+    console.log('[VIEWER] Starting viewer connection');
+    viewer.signalingClient.open();
+}
+
+function stopViewer() {
+    console.log('[VIEWER] Stopping viewer connection');
+    if (viewer.signalingClient) {
+        viewer.signalingClient.close();
+        viewer.signalingClient = null;
+    }
+
+    if (viewer.peerConnection) {
+        viewer.peerConnection.close();
+        viewer.peerConnection = null;
+    }
+
+    if (viewer.localStream) {
+        viewer.localStream.getTracks().forEach(track => track.stop());
+        viewer.localStream = null;
+    }
+
+    if (viewer.remoteStream) {
+        viewer.remoteStream.getTracks().forEach(track => track.stop());
+        viewer.remoteStream = null;
+    }
+
+    if (viewer.peerConnectionStatsInterval) {
+        clearInterval(viewer.peerConnectionStatsInterval);
+        viewer.peerConnectionStatsInterval = null;
+    }
+
+    if (viewer.localView) {
+        viewer.localView.srcObject = null;
+    }
+
+    if (viewer.remoteView) {
+        viewer.remoteView.srcObject = null;
+    }
+
+    if (viewer.dataChannel) {
+        viewer.dataChannel = null;
+    }
+}
+
+function sendViewerMessage(message) {
+    if (viewer.dataChannel) {
+        try {
+            viewer.dataChannel.send(message);
+        } catch (e) {
+            console.error('[VIEWER] Send DataChannel: ', e.toString());
+        }
+    }
+}
+</script>
+
+<script>
+/**
+ * This file demonstrates the process of starting WebRTC streaming using a KVS Signaling Channel.
+ */
+const master = {
+    signalingClient: null,
+    peerConnectionByClientId: {},
+    dataChannelByClientId: {},
+    localStream: null,
+    remoteStreams: [],
+    peerConnectionStatsInterval: null,
+};
+
+async function startMaster(localView, remoteView, formValues, onStatsReport, onRemoteDataMessage) {
+    master.localView = localView;
+    master.remoteView = remoteView;
+
+    // Create KVS client
+    const kinesisVideoClient = new AWS.KinesisVideo({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: formValues.endpoint,
+        correctClockSkew: true,
+    });
+
+    // Get signaling channel ARN
+    const describeSignalingChannelResponse = await kinesisVideoClient
+        .describeSignalingChannel({
+            ChannelName: formValues.channelName,
+        })
+        .promise();
+    const channelARN = describeSignalingChannelResponse.ChannelInfo.ChannelARN;
+    console.log('[MASTER] Channel ARN: ', channelARN);
+
+    // Get signaling channel endpoints
+    const getSignalingChannelEndpointResponse = await kinesisVideoClient
+        .getSignalingChannelEndpoint({
+            ChannelARN: channelARN,
+            SingleMasterChannelEndpointConfiguration: {
+                Protocols: ['WSS', 'HTTPS'],
+                Role: KVSWebRTC.Role.MASTER,
+            },
+        })
+        .promise();
+    const endpointsByProtocol = getSignalingChannelEndpointResponse.ResourceEndpointList.reduce((endpoints, endpoint) => {
+        endpoints[endpoint.Protocol] = endpoint.ResourceEndpoint;
+        return endpoints;
+    }, {});
+    console.log('[MASTER] Endpoints: ', endpointsByProtocol);
+
+    // Create Signaling Client
+    master.signalingClient = new KVSWebRTC.SignalingClient({
+        channelARN,
+        channelEndpoint: endpointsByProtocol.WSS,
+        role: KVSWebRTC.Role.MASTER,
+        region: formValues.region,
+        credentials: {
+            accessKeyId: formValues.accessKeyId,
+            secretAccessKey: formValues.secretAccessKey,
+            sessionToken: formValues.sessionToken,
+        },
+        systemClockOffset: kinesisVideoClient.config.systemClockOffset,
+    });
+
+    // Get ICE server configuration
+    const kinesisVideoSignalingChannelsClient = new AWS.KinesisVideoSignalingChannels({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: endpointsByProtocol.HTTPS,
+        correctClockSkew: true,
+    });
+    const getIceServerConfigResponse = await kinesisVideoSignalingChannelsClient
+        .getIceServerConfig({
+            ChannelARN: channelARN,
+        })
+        .promise();
+    const iceServers = [];
+    if (!formValues.natTraversalDisabled && !formValues.forceTURN) {
+        iceServers.push({ urls: `stun:stun.kinesisvideo.${formValues.region}.amazonaws.com:443` });
+    }
+    if (!formValues.natTraversalDisabled) {
+        getIceServerConfigResponse.IceServerList.forEach(iceServer =>
+            iceServers.push({
+                urls: iceServer.Uris,
+                username: iceServer.Username,
+                credential: iceServer.Password,
+            }),
+        );
+    }
+    console.log('[MASTER] ICE servers: ', iceServers);
+
+    const configuration = {
+        iceServers,
+        iceTransportPolicy: formValues.forceTURN ? 'relay' : 'all',
+    };
+
+    const resolution = formValues.widescreen ? { width: { ideal: 1280 }, height: { ideal: 720 } } : { width: { ideal: 640 }, height: { ideal: 480 } };
+    const constraints = {
+        video: formValues.sendVideo ? resolution : false,
+        audio: formValues.sendAudio,
+    };
+
+    // Get a stream from the webcam and display it in the local view.
+    // If no video/audio needed, no need to request for the sources.
+    // Otherwise, the browser will throw an error saying that either video or audio has to be enabled.
+    if (formValues.sendVideo || formValues.sendAudio) {
+        try {
+            master.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            localView.srcObject = master.localStream;
+        } catch (e) {
+            console.error('[MASTER] Could not find webcam');
+        }
+    }
+
+    master.signalingClient.on('open', async () => {
+        console.log('[MASTER] Connected to signaling service');
+    });
+
+    master.signalingClient.on('sdpOffer', async (offer, remoteClientId) => {
+        console.log('[MASTER] Received SDP offer from client: ' + remoteClientId);
+
+        // Create a new peer connection using the offer from the given client
+        const peerConnection = new RTCPeerConnection(configuration);
+        master.peerConnectionByClientId[remoteClientId] = peerConnection;
+
+        if (formValues.openDataChannel) {
+            master.dataChannelByClientId[remoteClientId] = peerConnection.createDataChannel('kvsDataChannel');
+            peerConnection.ondatachannel = event => {
+                event.channel.onmessage = onRemoteDataMessage;
+            };
+        }
+
+        // Poll for connection stats
+        if (!master.peerConnectionStatsInterval) {
+            master.peerConnectionStatsInterval = setInterval(() => peerConnection.getStats().then(onStatsReport), 1000);
+        }
+
+        // Send any ICE candidates to the other peer
+        peerConnection.addEventListener('icecandidate', ({ candidate }) => {
+            if (candidate) {
+                console.log('[MASTER] Generated ICE candidate for client: ' + remoteClientId);
+
+                // When trickle ICE is enabled, send the ICE candidates as they are generated.
+                if (formValues.useTrickleICE) {
+                    console.log('[MASTER] Sending ICE candidate to client: ' + remoteClientId);
+                    master.signalingClient.sendIceCandidate(candidate, remoteClientId);
+                }
+            } else {
+                console.log('[MASTER] All ICE candidates have been generated for client: ' + remoteClientId);
+
+                // When trickle ICE is disabled, send the answer now that all the ICE candidates have ben generated.
+                if (!formValues.useTrickleICE) {
+                    console.log('[MASTER] Sending SDP answer to client: ' + remoteClientId);
+                    master.signalingClient.sendSdpAnswer(peerConnection.localDescription, remoteClientId);
+                }
+            }
+        });
+
+        // As remote tracks are received, add them to the remote view
+        peerConnection.addEventListener('track', event => {
+            console.log('[MASTER] Received remote track from client: ' + remoteClientId);
+            if (remoteView.srcObject) {
+                return;
+            }
+            remoteView.srcObject = event.streams[0];
+        });
+
+        // If there's no video/audio, master.localStream will be null. So, we should skip adding the tracks from it.
+        if (master.localStream) {
+            master.localStream.getTracks().forEach(track => peerConnection.addTrack(track, master.localStream));
+        }
+        await peerConnection.setRemoteDescription(offer);
+
+        // Create an SDP answer to send back to the client
+        console.log('[MASTER] Creating SDP answer for client: ' + remoteClientId);
+        await peerConnection.setLocalDescription(
+            await peerConnection.createAnswer({
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true,
+            }),
+        );
+
+        // When trickle ICE is enabled, send the answer now and then send ICE candidates as they are generated. Otherwise wait on the ICE candidates.
+        if (formValues.useTrickleICE) {
+            console.log('[MASTER] Sending SDP answer to client: ' + remoteClientId);
+            master.signalingClient.sendSdpAnswer(peerConnection.localDescription, remoteClientId);
+        }
+        console.log('[MASTER] Generating ICE candidates for client: ' + remoteClientId);
+    });
+
+    master.signalingClient.on('iceCandidate', async (candidate, remoteClientId) => {
+        console.log('[MASTER] Received ICE candidate from client: ' + remoteClientId);
+
+        // Add the ICE candidate received from the client to the peer connection
+        const peerConnection = master.peerConnectionByClientId[remoteClientId];
+        peerConnection.addIceCandidate(candidate);
+    });
+
+    master.signalingClient.on('close', () => {
+        console.log('[MASTER] Disconnected from signaling channel');
+    });
+
+    master.signalingClient.on('error', () => {
+        console.error('[MASTER] Signaling client error');
+    });
+
+    console.log('[MASTER] Starting master connection');
+    master.signalingClient.open();
+}
+
+function stopMaster() {
+    console.log('[MASTER] Stopping master connection');
+    if (master.signalingClient) {
+        master.signalingClient.close();
+        master.signalingClient = null;
+    }
+
+    Object.keys(master.peerConnectionByClientId).forEach(clientId => {
+        master.peerConnectionByClientId[clientId].close();
+    });
+    master.peerConnectionByClientId = [];
+
+    if (master.localStream) {
+        master.localStream.getTracks().forEach(track => track.stop());
+        master.localStream = null;
+    }
+
+    master.remoteStreams.forEach(remoteStream => remoteStream.getTracks().forEach(track => track.stop()));
+    master.remoteStreams = [];
+
+    if (master.peerConnectionStatsInterval) {
+        clearInterval(master.peerConnectionStatsInterval);
+        master.peerConnectionStatsInterval = null;
+    }
+
+    if (master.localView) {
+        master.localView.srcObject = null;
+    }
+
+    if (master.remoteView) {
+        master.remoteView.srcObject = null;
+    }
+
+    if (master.dataChannelByClientId) {
+        master.dataChannelByClientId = {};
+    }
+}
+
+function sendMasterMessage(message) {
+    Object.keys(master.dataChannelByClientId).forEach(clientId => {
+        try {
+            master.dataChannelByClientId[clientId].send(message);
+        } catch (e) {
+            console.error('[MASTER] Send DataChannel: ', e.toString());
+        }
+    });
+}
+
+</script>
+
+
+<script>
+/**
+ * This file demonstrates the process of creating a KVS Signaling Channel.
+ */
+
+async function createSignalingChannel(formValues) {
+    // Create KVS client
+    const kinesisVideoClient = new AWS.KinesisVideo({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: formValues.endpoint,
+    });
+
+    // Get signaling channel ARN
+    await kinesisVideoClient
+        .createSignalingChannel({
+            ChannelName: formValues.channelName,
+        })
+        .promise();
+
+    // Get signaling channel ARN
+    const describeSignalingChannelResponse = await kinesisVideoClient
+        .describeSignalingChannel({
+            ChannelName: formValues.channelName,
+        })
+        .promise();
+    const channelARN = describeSignalingChannelResponse.ChannelInfo.ChannelARN;
+    console.log('[CREATE_SIGNALING_CHANNEL] Channel ARN: ', channelARN);
+}
+
+</script>
+
+
+
+<style>
+    .video-container {
+    background: black;
+    display: inline-block;
+    line-height: 0;
+    max-width: 100%;
+    width: 100%;
+}
+
+#logs-header {
+    margin-top: 20px;
+}
+
+.preserve-whitespace {
+    white-space: pre-wrap;
+}
+
+video {
+    width: 100%;
+}
+
+pre .error {
+    color: red;
+}
+
+pre .warn {
+    color: goldenrod;
+}
+
+
+
+
+
+
+.loader,
+.loader:after {
+    border-radius: 50%;
+    width: 10em;
+    height: 10em;
+}
+
+.loader {
+    margin: 60px auto;
+    font-size: 10px;
+    position: relative;
+    text-indent: -9999em;
+    border-top: 1.1em solid rgba(0, 0, 0, 0.2);
+    border-right: 1.1em solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1.1em solid rgba(0, 0, 0, 0.2);
+    border-left: 1.1em solid #000000;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation: load8 1.1s infinite linear;
+    animation: load8 1.1s infinite linear;
+}
+@-webkit-keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+@keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+</style>
+
+
+
+
+
+
+
+<script>
+let ROLE = null; // Possible values: 'master', 'viewer', null
+
+
+
+function configureLogging() {
+    function log(level, messages) {
+        const text = messages
+            .map(message => {
+                if (typeof message === 'object') {
+                    return JSON.stringify(message, null, 2);
+                } else {
+                    return message;
+                }
+            })
+            .join(' ');
+        $('#logs').append($(`<div class="${level.toLowerCase()}">`).text(`[${new Date().toISOString()}] [${level}] ${text}\n`));
+    }
+
+    console._error = console.error;
+    console.error = function(...rest) {
+        log('ERROR', Array.prototype.slice.call(rest));
+        console._error.apply(this, rest);
+    };
+
+
+
+    console._warn = console.warn;
+    console.warn = function(...rest) {
+        log('WARN', Array.prototype.slice.call(rest));
+        console._warn.apply(this, rest);
+    };
+
+    console._log = console.log;
+    console.log = function(...rest) {
+        log('INFO', Array.prototype.slice.call(rest));
+        console._log.apply(this, rest);
+    };
+}
+
+function getRandomClientId() {
+    return Math.random()
+        .toString(36)
+        .substring(2)
+        .toUpperCase();
+}
+
+function getFormValues() {
+    return {
+        region: $('#region').val(),
+        channelName: $('#channelName').val(),
+        clientId: $('#clientId').val() || getRandomClientId(),
+        sendVideo: $('#sendVideo').is(':checked'),
+        sendAudio: $('#sendAudio').is(':checked'),
+        openDataChannel: $('#openDataChannel').is(':checked'),
+        widescreen: $('#widescreen').is(':checked'),
+        fullscreen: $('#fullscreen').is(':checked'),
+        useTrickleICE: $('#useTrickleICE').is(':checked'),
+        natTraversalDisabled: $('#natTraversalDisabled').is(':checked'),
+        forceTURN: $('#forceTURN').is(':checked'),
+        accessKeyId: $('#accessKeyId').val(),
+        endpoint: $('#endpoint').val() || null,
+        secretAccessKey: $('#secretAccessKey').val(),
+        sessionToken: $('#sessionToken').val() || null,
+    };
+}
+
+function toggleDataChannelElements() {
+    if (getFormValues().openDataChannel) {
+        $('.datachannel').removeClass('d-none');
+    } else {
+        $('.datachannel').addClass('d-none');
+    }
+}
+
+function onStatsReport(report) {
+    // TODO: Publish stats
+}
+
+function onStop() {
+    if (!ROLE) {
+        return;
+    }
+
+    if (ROLE === 'master') {
+        stopMaster();
+        $('#master').addClass('d-none');
+    } else {
+        stopViewer();
+        $('#viewer').addClass('d-none');
+    }
+
+    $('#form').removeClass('d-none');
+    ROLE = null;
+}
+
+window.addEventListener('beforeunload', onStop);
+
+window.addEventListener('error', function(event) {
+    console.error(event.message);
+    event.preventDefault();
+});
+
+window.addEventListener('unhandledrejection', function(event) {
+    console.error(event.reason.toString());
+    event.preventDefault();
+});
+
+configureLogging();
+
+$('#master-button').click(async () => {
+    ROLE = 'master';
+    $('#form').addClass('d-none');
+    $('#master').removeClass('d-none');
+
+    const localView = $('#master .local-view')[0];
+    const remoteView = $('#master .remote-view')[0];
+    const localMessage = $('#master .local-message')[0];
+    const remoteMessage = $('#master .remote-message')[0];
+    const formValues = getFormValues();
+
+    $(remoteMessage).empty();
+    localMessage.value = '';
+    toggleDataChannelElements();
+
+    startMaster(localView, remoteView, formValues, onStatsReport, event => {
+        remoteMessage.append(`${event.data}\n`);
+    });
+});
+
+$('#stop-master-button').click(onStop);
+
+$('#viewer-button').click(async () => {
+    ROLE = 'viewer';
+    $('#form').addClass('d-none');
+    $('#viewer').removeClass('d-none');
+
+    const localView = $('#viewer .local-view')[0];
+    const remoteView = $('#viewer .remote-view')[0];
+    const localMessage = $('#viewer .local-message')[0];
+    const remoteMessage = $('#viewer .remote-message')[0];
+    const formValues = getFormValues();
+
+    $(remoteMessage).empty();
+    localMessage.value = '';
+    toggleDataChannelElements();
+
+    startViewer(localView, remoteView, formValues, onStatsReport, event => {
+        remoteMessage.append(`${event.data}\n`);
+    });
+});
+
+$('#stop-viewer-button').click(onStop);
+
+$('#create-channel-button').click(async () => {
+    const formValues = getFormValues();
+
+    createSignalingChannel(formValues);
+});
+
+$('#master .send-message').click(async () => {
+    const masterLocalMessage = $('#master .local-message')[0];
+    sendMasterMessage(masterLocalMessage.value);
+});
+
+$('#viewer .send-message').click(async () => {
+    const viewerLocalMessage = $('#viewer .local-message')[0];
+    sendViewerMessage(viewerLocalMessage.value);
+});
+
+// Read/Write all of the fields to/from localStorage so that fields are not lost on refresh.
+const urlParams = new URLSearchParams(window.location.search);
+const fields = [
+    { field: 'channelName', type: 'text' },
+    { field: 'clientId', type: 'text' },
+    { field: 'region', type: 'text' },
+    { field: 'accessKeyId', type: 'text' },
+    { field: 'secretAccessKey', type: 'text' },
+    { field: 'sessionToken', type: 'text' },
+    { field: 'endpoint', type: 'text' },
+    { field: 'sendVideo', type: 'checkbox' },
+    { field: 'sendAudio', type: 'checkbox' },
+    { field: 'widescreen', type: 'radio', name: 'resolution' },
+    { field: 'fullscreen', type: 'radio', name: 'resolution' },
+    { field: 'openDataChannel', type: 'checkbox' },
+    { field: 'useTrickleICE', type: 'checkbox' },
+    { field: 'natTraversalEnabled', type: 'radio', name: 'natTraversal' },
+    { field: 'forceTURN', type: 'radio', name: 'natTraversal' },
+    { field: 'natTraversalDisabled', type: 'radio', name: 'natTraversal' },
+];
+fields.forEach(({ field, type, name }) => {
+    const id = '#' + field;
+
+    // Read field from localStorage
+    try {
+        const localStorageValue = localStorage.getItem(field);
+        if (localStorageValue) {
+            if (type === 'checkbox' || type === 'radio') {
+                $(id).prop('checked', localStorageValue === 'true');
+            } else {
+                $(id).val(localStorageValue);
+            }
+            $(id).trigger('change');
+        }
+    } catch (e) {
+        /* Don't use localStorage */
+    }
+
+    // Read field from query string
+    if (urlParams.has(field)) {
+        paramValue = urlParams.get(field);
+        if (type === 'checkbox' || type === 'radio') {
+            $(id).prop('checked', paramValue === 'true');
+        } else {
+            $(id).val(paramValue);
+        }
+    }
+
+    // Write field to localstorage on change event
+    $(id).change(function() {
+        try {
+            if (type === 'checkbox') {
+                localStorage.setItem(field, $(id).is(':checked'));
+            } else if (type === 'radio') {
+                fields
+                    .filter(fieldItem => fieldItem.name === name)
+                    .forEach(fieldItem => {
+                        localStorage.setItem(fieldItem.field, fieldItem.field === field);
+                    });
+            } else {
+                localStorage.setItem(field, $(id).val());
+            }
+        } catch (e) {
+            /* Don't use localStorage */
+        }
+    });
+});
+
+// The page is all setup. Hide the loading spinner and show the page content.
+$('.loader').addClass('d-none');
+$('#main').removeClass('d-none');
+console.log('Page loaded');
+
+</script>
+
+
+<script>
+/**
+ * This file demonstrates the process of starting WebRTC streaming using a KVS Signaling Channel.
+ */
+const viewer = {};
+
+async function startViewer(localView, remoteView, formValues, onStatsReport, onRemoteDataMessage) {
+    viewer.localView = localView;
+    viewer.remoteView = remoteView;
+
+    // Create KVS client
+    const kinesisVideoClient = new AWS.KinesisVideo({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: formValues.endpoint,
+        correctClockSkew: true,
+    });
+
+    // Get signaling channel ARN
+    const describeSignalingChannelResponse = await kinesisVideoClient
+        .describeSignalingChannel({
+            ChannelName: formValues.channelName,
+        })
+        .promise();
+    const channelARN = describeSignalingChannelResponse.ChannelInfo.ChannelARN;
+    console.log('[VIEWER] Channel ARN: ', channelARN);
+
+    // Get signaling channel endpoints
+    const getSignalingChannelEndpointResponse = await kinesisVideoClient
+        .getSignalingChannelEndpoint({
+            ChannelARN: channelARN,
+            SingleMasterChannelEndpointConfiguration: {
+                Protocols: ['WSS', 'HTTPS'],
+                Role: KVSWebRTC.Role.VIEWER,
+            },
+        })
+        .promise();
+    const endpointsByProtocol = getSignalingChannelEndpointResponse.ResourceEndpointList.reduce((endpoints, endpoint) => {
+        endpoints[endpoint.Protocol] = endpoint.ResourceEndpoint;
+        return endpoints;
+    }, {});
+    console.log('[VIEWER] Endpoints: ', endpointsByProtocol);
+
+    const kinesisVideoSignalingChannelsClient = new AWS.KinesisVideoSignalingChannels({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: endpointsByProtocol.HTTPS,
+        correctClockSkew: true,
+    });
+
+    // Get ICE server configuration
+    const getIceServerConfigResponse = await kinesisVideoSignalingChannelsClient
+        .getIceServerConfig({
+            ChannelARN: channelARN,
+        })
+        .promise();
+    const iceServers = [];
+    if (!formValues.natTraversalDisabled && !formValues.forceTURN) {
+        iceServers.push({ urls: `stun:stun.kinesisvideo.${formValues.region}.amazonaws.com:443` });
+    }
+    if (!formValues.natTraversalDisabled) {
+        getIceServerConfigResponse.IceServerList.forEach(iceServer =>
+            iceServers.push({
+                urls: iceServer.Uris,
+                username: iceServer.Username,
+                credential: iceServer.Password,
+            }),
+        );
+    }
+    console.log('[VIEWER] ICE servers: ', iceServers);
+
+    // Create Signaling Client
+    viewer.signalingClient = new KVSWebRTC.SignalingClient({
+        channelARN,
+        channelEndpoint: endpointsByProtocol.WSS,
+        clientId: formValues.clientId,
+        role: KVSWebRTC.Role.VIEWER,
+        region: formValues.region,
+        credentials: {
+            accessKeyId: formValues.accessKeyId,
+            secretAccessKey: formValues.secretAccessKey,
+            sessionToken: formValues.sessionToken,
+        },
+        systemClockOffset: kinesisVideoClient.config.systemClockOffset,
+    });
+
+    const resolution = formValues.widescreen ? { width: { ideal: 1280 }, height: { ideal: 720 } } : { width: { ideal: 640 }, height: { ideal: 480 } };
+    const constraints = {
+        video: formValues.sendVideo ? resolution : false,
+        audio: formValues.sendAudio,
+    };
+    const configuration = {
+        iceServers,
+        iceTransportPolicy: formValues.forceTURN ? 'relay' : 'all',
+    };
+    viewer.peerConnection = new RTCPeerConnection(configuration);
+    if (formValues.openDataChannel) {
+        viewer.dataChannel = viewer.peerConnection.createDataChannel('kvsDataChannel');
+        viewer.peerConnection.ondatachannel = event => {
+            event.channel.onmessage = onRemoteDataMessage;
+        };
+    }
+
+    // Poll for connection stats
+    viewer.peerConnectionStatsInterval = setInterval(() => viewer.peerConnection.getStats().then(onStatsReport), 1000);
+
+    viewer.signalingClient.on('open', async () => {
+        console.log('[VIEWER] Connected to signaling service');
+
+        // Get a stream from the webcam, add it to the peer connection, and display it in the local view.
+        // If no video/audio needed, no need to request for the sources.
+        // Otherwise, the browser will throw an error saying that either video or audio has to be enabled.
+        if (formValues.sendVideo || formValues.sendAudio) {
+            try {
+                viewer.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                viewer.localStream.getTracks().forEach(track => viewer.peerConnection.addTrack(track, viewer.localStream));
+                localView.srcObject = viewer.localStream;
+            } catch (e) {
+                console.error('[VIEWER] Could not find webcam');
+                return;
+            }
+        }
+
+        // Create an SDP offer to send to the master
+        console.log('[VIEWER] Creating SDP offer');
+        await viewer.peerConnection.setLocalDescription(
+            await viewer.peerConnection.createOffer({
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true,
+            }),
+        );
+
+        // When trickle ICE is enabled, send the offer now and then send ICE candidates as they are generated. Otherwise wait on the ICE candidates.
+        if (formValues.useTrickleICE) {
+            console.log('[VIEWER] Sending SDP offer');
+            viewer.signalingClient.sendSdpOffer(viewer.peerConnection.localDescription);
+        }
+        console.log('[VIEWER] Generating ICE candidates');
+    });
+
+    viewer.signalingClient.on('sdpAnswer', async answer => {
+        // Add the SDP answer to the peer connection
+        console.log('[VIEWER] Received SDP answer');
+        await viewer.peerConnection.setRemoteDescription(answer);
+    });
+
+    viewer.signalingClient.on('iceCandidate', candidate => {
+        // Add the ICE candidate received from the MASTER to the peer connection
+        console.log('[VIEWER] Received ICE candidate');
+        viewer.peerConnection.addIceCandidate(candidate);
+    });
+
+    viewer.signalingClient.on('close', () => {
+        console.log('[VIEWER] Disconnected from signaling channel');
+    });
+
+    viewer.signalingClient.on('error', error => {
+        console.error('[VIEWER] Signaling client error: ', error);
+    });
+
+    // Send any ICE candidates to the other peer
+    viewer.peerConnection.addEventListener('icecandidate', ({ candidate }) => {
+        if (candidate) {
+            console.log('[VIEWER] Generated ICE candidate');
+
+            // When trickle ICE is enabled, send the ICE candidates as they are generated.
+            if (formValues.useTrickleICE) {
+                console.log('[VIEWER] Sending ICE candidate');
+                viewer.signalingClient.sendIceCandidate(candidate);
+            }
+        } else {
+            console.log('[VIEWER] All ICE candidates have been generated');
+
+            // When trickle ICE is disabled, send the offer now that all the ICE candidates have ben generated.
+            if (!formValues.useTrickleICE) {
+                console.log('[VIEWER] Sending SDP offer');
+                viewer.signalingClient.sendSdpOffer(viewer.peerConnection.localDescription);
+            }
+        }
+    });
+
+    // As remote tracks are received, add them to the remote view
+    viewer.peerConnection.addEventListener('track', event => {
+        console.log('[VIEWER] Received remote track');
+        if (remoteView.srcObject) {
+            return;
+        }
+        viewer.remoteStream = event.streams[0];
+        remoteView.srcObject = viewer.remoteStream;
+    });
+
+    console.log('[VIEWER] Starting viewer connection');
+    viewer.signalingClient.open();
+}
+
+function stopViewer() {
+    console.log('[VIEWER] Stopping viewer connection');
+    if (viewer.signalingClient) {
+        viewer.signalingClient.close();
+        viewer.signalingClient = null;
+    }
+
+    if (viewer.peerConnection) {
+        viewer.peerConnection.close();
+        viewer.peerConnection = null;
+    }
+
+    if (viewer.localStream) {
+        viewer.localStream.getTracks().forEach(track => track.stop());
+        viewer.localStream = null;
+    }
+
+    if (viewer.remoteStream) {
+        viewer.remoteStream.getTracks().forEach(track => track.stop());
+        viewer.remoteStream = null;
+    }
+
+    if (viewer.peerConnectionStatsInterval) {
+        clearInterval(viewer.peerConnectionStatsInterval);
+        viewer.peerConnectionStatsInterval = null;
+    }
+
+    if (viewer.localView) {
+        viewer.localView.srcObject = null;
+    }
+
+    if (viewer.remoteView) {
+        viewer.remoteView.srcObject = null;
+    }
+
+    if (viewer.dataChannel) {
+        viewer.dataChannel = null;
+    }
+}
+
+function sendViewerMessage(message) {
+    if (viewer.dataChannel) {
+        try {
+            viewer.dataChannel.send(message);
+        } catch (e) {
+            console.error('[VIEWER] Send DataChannel: ', e.toString());
+        }
+    }
+}
+</script>
+
+<script>
+/**
+ * This file demonstrates the process of starting WebRTC streaming using a KVS Signaling Channel.
+ */
+const master = {
+    signalingClient: null,
+    peerConnectionByClientId: {},
+    dataChannelByClientId: {},
+    localStream: null,
+    remoteStreams: [],
+    peerConnectionStatsInterval: null,
+};
+
+async function startMaster(localView, remoteView, formValues, onStatsReport, onRemoteDataMessage) {
+    master.localView = localView;
+    master.remoteView = remoteView;
+
+    // Create KVS client
+    const kinesisVideoClient = new AWS.KinesisVideo({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: formValues.endpoint,
+        correctClockSkew: true,
+    });
+
+    // Get signaling channel ARN
+    const describeSignalingChannelResponse = await kinesisVideoClient
+        .describeSignalingChannel({
+            ChannelName: formValues.channelName,
+        })
+        .promise();
+    const channelARN = describeSignalingChannelResponse.ChannelInfo.ChannelARN;
+    console.log('[MASTER] Channel ARN: ', channelARN);
+
+    // Get signaling channel endpoints
+    const getSignalingChannelEndpointResponse = await kinesisVideoClient
+        .getSignalingChannelEndpoint({
+            ChannelARN: channelARN,
+            SingleMasterChannelEndpointConfiguration: {
+                Protocols: ['WSS', 'HTTPS'],
+                Role: KVSWebRTC.Role.MASTER,
+            },
+        })
+        .promise();
+    const endpointsByProtocol = getSignalingChannelEndpointResponse.ResourceEndpointList.reduce((endpoints, endpoint) => {
+        endpoints[endpoint.Protocol] = endpoint.ResourceEndpoint;
+        return endpoints;
+    }, {});
+    console.log('[MASTER] Endpoints: ', endpointsByProtocol);
+
+    // Create Signaling Client
+    master.signalingClient = new KVSWebRTC.SignalingClient({
+        channelARN,
+        channelEndpoint: endpointsByProtocol.WSS,
+        role: KVSWebRTC.Role.MASTER,
+        region: formValues.region,
+        credentials: {
+            accessKeyId: formValues.accessKeyId,
+            secretAccessKey: formValues.secretAccessKey,
+            sessionToken: formValues.sessionToken,
+        },
+        systemClockOffset: kinesisVideoClient.config.systemClockOffset,
+    });
+
+    // Get ICE server configuration
+    const kinesisVideoSignalingChannelsClient = new AWS.KinesisVideoSignalingChannels({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: endpointsByProtocol.HTTPS,
+        correctClockSkew: true,
+    });
+    const getIceServerConfigResponse = await kinesisVideoSignalingChannelsClient
+        .getIceServerConfig({
+            ChannelARN: channelARN,
+        })
+        .promise();
+    const iceServers = [];
+    if (!formValues.natTraversalDisabled && !formValues.forceTURN) {
+        iceServers.push({ urls: `stun:stun.kinesisvideo.${formValues.region}.amazonaws.com:443` });
+    }
+    if (!formValues.natTraversalDisabled) {
+        getIceServerConfigResponse.IceServerList.forEach(iceServer =>
+            iceServers.push({
+                urls: iceServer.Uris,
+                username: iceServer.Username,
+                credential: iceServer.Password,
+            }),
+        );
+    }
+    console.log('[MASTER] ICE servers: ', iceServers);
+
+    const configuration = {
+        iceServers,
+        iceTransportPolicy: formValues.forceTURN ? 'relay' : 'all',
+    };
+
+    const resolution = formValues.widescreen ? { width: { ideal: 1280 }, height: { ideal: 720 } } : { width: { ideal: 640 }, height: { ideal: 480 } };
+    const constraints = {
+        video: formValues.sendVideo ? resolution : false,
+        audio: formValues.sendAudio,
+    };
+
+    // Get a stream from the webcam and display it in the local view.
+    // If no video/audio needed, no need to request for the sources.
+    // Otherwise, the browser will throw an error saying that either video or audio has to be enabled.
+    if (formValues.sendVideo || formValues.sendAudio) {
+        try {
+            master.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+            localView.srcObject = master.localStream;
+        } catch (e) {
+            console.error('[MASTER] Could not find webcam');
+        }
+    }
+
+    master.signalingClient.on('open', async () => {
+        console.log('[MASTER] Connected to signaling service');
+    });
+
+    master.signalingClient.on('sdpOffer', async (offer, remoteClientId) => {
+        console.log('[MASTER] Received SDP offer from client: ' + remoteClientId);
+
+        // Create a new peer connection using the offer from the given client
+        const peerConnection = new RTCPeerConnection(configuration);
+        master.peerConnectionByClientId[remoteClientId] = peerConnection;
+
+        if (formValues.openDataChannel) {
+            master.dataChannelByClientId[remoteClientId] = peerConnection.createDataChannel('kvsDataChannel');
+            peerConnection.ondatachannel = event => {
+                event.channel.onmessage = onRemoteDataMessage;
+            };
+        }
+
+        // Poll for connection stats
+        if (!master.peerConnectionStatsInterval) {
+            master.peerConnectionStatsInterval = setInterval(() => peerConnection.getStats().then(onStatsReport), 1000);
+        }
+
+        // Send any ICE candidates to the other peer
+        peerConnection.addEventListener('icecandidate', ({ candidate }) => {
+            if (candidate) {
+                console.log('[MASTER] Generated ICE candidate for client: ' + remoteClientId);
+
+                // When trickle ICE is enabled, send the ICE candidates as they are generated.
+                if (formValues.useTrickleICE) {
+                    console.log('[MASTER] Sending ICE candidate to client: ' + remoteClientId);
+                    master.signalingClient.sendIceCandidate(candidate, remoteClientId);
+                }
+            } else {
+                console.log('[MASTER] All ICE candidates have been generated for client: ' + remoteClientId);
+
+                // When trickle ICE is disabled, send the answer now that all the ICE candidates have ben generated.
+                if (!formValues.useTrickleICE) {
+                    console.log('[MASTER] Sending SDP answer to client: ' + remoteClientId);
+                    master.signalingClient.sendSdpAnswer(peerConnection.localDescription, remoteClientId);
+                }
+            }
+        });
+
+        // As remote tracks are received, add them to the remote view
+        peerConnection.addEventListener('track', event => {
+            console.log('[MASTER] Received remote track from client: ' + remoteClientId);
+            if (remoteView.srcObject) {
+                return;
+            }
+            remoteView.srcObject = event.streams[0];
+        });
+
+        // If there's no video/audio, master.localStream will be null. So, we should skip adding the tracks from it.
+        if (master.localStream) {
+            master.localStream.getTracks().forEach(track => peerConnection.addTrack(track, master.localStream));
+        }
+        await peerConnection.setRemoteDescription(offer);
+
+        // Create an SDP answer to send back to the client
+        console.log('[MASTER] Creating SDP answer for client: ' + remoteClientId);
+        await peerConnection.setLocalDescription(
+            await peerConnection.createAnswer({
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true,
+            }),
+        );
+
+        // When trickle ICE is enabled, send the answer now and then send ICE candidates as they are generated. Otherwise wait on the ICE candidates.
+        if (formValues.useTrickleICE) {
+            console.log('[MASTER] Sending SDP answer to client: ' + remoteClientId);
+            master.signalingClient.sendSdpAnswer(peerConnection.localDescription, remoteClientId);
+        }
+        console.log('[MASTER] Generating ICE candidates for client: ' + remoteClientId);
+    });
+
+    master.signalingClient.on('iceCandidate', async (candidate, remoteClientId) => {
+        console.log('[MASTER] Received ICE candidate from client: ' + remoteClientId);
+
+        // Add the ICE candidate received from the client to the peer connection
+        const peerConnection = master.peerConnectionByClientId[remoteClientId];
+        peerConnection.addIceCandidate(candidate);
+    });
+
+    master.signalingClient.on('close', () => {
+        console.log('[MASTER] Disconnected from signaling channel');
+    });
+
+    master.signalingClient.on('error', () => {
+        console.error('[MASTER] Signaling client error');
+    });
+
+    console.log('[MASTER] Starting master connection');
+    master.signalingClient.open();
+}
+
+function stopMaster() {
+    console.log('[MASTER] Stopping master connection');
+    if (master.signalingClient) {
+        master.signalingClient.close();
+        master.signalingClient = null;
+    }
+
+    Object.keys(master.peerConnectionByClientId).forEach(clientId => {
+        master.peerConnectionByClientId[clientId].close();
+    });
+    master.peerConnectionByClientId = [];
+
+    if (master.localStream) {
+        master.localStream.getTracks().forEach(track => track.stop());
+        master.localStream = null;
+    }
+
+    master.remoteStreams.forEach(remoteStream => remoteStream.getTracks().forEach(track => track.stop()));
+    master.remoteStreams = [];
+
+    if (master.peerConnectionStatsInterval) {
+        clearInterval(master.peerConnectionStatsInterval);
+        master.peerConnectionStatsInterval = null;
+    }
+
+    if (master.localView) {
+        master.localView.srcObject = null;
+    }
+
+    if (master.remoteView) {
+        master.remoteView.srcObject = null;
+    }
+
+    if (master.dataChannelByClientId) {
+        master.dataChannelByClientId = {};
+    }
+}
+
+function sendMasterMessage(message) {
+    Object.keys(master.dataChannelByClientId).forEach(clientId => {
+        try {
+            master.dataChannelByClientId[clientId].send(message);
+        } catch (e) {
+            console.error('[MASTER] Send DataChannel: ', e.toString());
+        }
+    });
+}
+
+</script>
+
+
+<script>
+/**
+ * This file demonstrates the process of creating a KVS Signaling Channel.
+ */
+
+async function createSignalingChannel(formValues) {
+    // Create KVS client
+    const kinesisVideoClient = new AWS.KinesisVideo({
+        region: formValues.region,
+        accessKeyId: formValues.accessKeyId,
+        secretAccessKey: formValues.secretAccessKey,
+        sessionToken: formValues.sessionToken,
+        endpoint: formValues.endpoint,
+    });
+
+    // Get signaling channel ARN
+    await kinesisVideoClient
+        .createSignalingChannel({
+            ChannelName: formValues.channelName,
+        })
+        .promise();
+
+    // Get signaling channel ARN
+    const describeSignalingChannelResponse = await kinesisVideoClient
+        .describeSignalingChannel({
+            ChannelName: formValues.channelName,
+        })
+        .promise();
+    const channelARN = describeSignalingChannelResponse.ChannelInfo.ChannelARN;
+    console.log('[CREATE_SIGNALING_CHANNEL] Channel ARN: ', channelARN);
+}
+
+</script>
+
+
+
+<style>
+    .video-container {
+    background: black;
+    display: inline-block;
+    line-height: 0;
+    max-width: 100%;
+    width: 100%;
+}
+
+#logs-header {
+    margin-top: 20px;
+}
+
+.preserve-whitespace {
+    white-space: pre-wrap;
+}
+
+video {
+    width: 100%;
+}
+
+pre .error {
+    color: red;
+}
+
+pre .warn {
+    color: goldenrod;
+}
+
+
+
+
+
+
+.loader,
+.loader:after {
+    border-radius: 50%;
+    width: 10em;
+    height: 10em;
+}
+
+.loader {
+    margin: 60px auto;
+    font-size: 10px;
+    position: relative;
+    text-indent: -9999em;
+    border-top: 1.1em solid rgba(0, 0, 0, 0.2);
+    border-right: 1.1em solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1.1em solid rgba(0, 0, 0, 0.2);
+    border-left: 1.1em solid #000000;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation: load8 1.1s infinite linear;
+    animation: load8 1.1s infinite linear;
+}
+@-webkit-keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+@keyframes load8 {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Footer     --------->
+<hr/>
+<div class="footer-container-page">
+    <section class="footer-page">
+      <div class="footerlinks-page" >
+         <a href="{% url 'about' %}"> About Us</a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}"> Contact </a>
+     </div>
+
+     <div class="footerlinks-page">
+        <a href="{% url 'contact' %}">Add Your Clinic/Hospital</a>
+     </div>
+
+    </section>
+
+    <div class="socialcontainer-page">
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/facebook.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/instagram.png' %}" /></a>
+      <a href="#"><img class="socialmedia-page" src="{% static 'images/twitter.png' %}" /></a>
+    </div>
+
+    <main class="lastline-page">
+     <span class="credit"> <a href="#">DRE </a>|</span>
+       <img class="socialmedia" id="copyright" src="{% static 'images/copyright.png' %}" />
+       2021 All rights reserved.
+    </main>
+
+</div>
+
+<!--Css Of Footer-->
+<style type="text/css">
+
+  /* for desktop */
+  @media(min-width:300px) and (max-width:3000px){
+    .footer-container-page{
+      display:block;
+      text-align:center;
+     }
+    .footer-page{
+      justify-content:center;
+      display:flex;
+    }
+    .footerlinks-page{
+      padding-left:40px;
+
+    }
+    .footerlinks-page a{
+      color:rgb(153, 153, 153);
+      font-size: xx-small;
+    }
+    .socialmedia-page{
+      height:20px;
+      width:50px;
+      padding-left:30px;
+    }
+    .lastline-page a{
+      font-size: 15px;
+      color:#000000;
+    }
+    .lastline-page{
+      font-size: xx-small;
+      color:#929292;
+    }
+    #copyright{
+      height:15px;
+      width:15px;
+    }
+  }
+
+
+    /*Footer-page for mobile  */
+
+    @media(max-width:300px){
+    .footer-container-page{
+      display:block;
+      text-align:center;
+     }
+    .footer-page{
+      justify-content:center;
+      display:flex;
+    }
+    .footerlinks-page{
+      padding-left:10px;
+
+    }
+    .footerlinks-page a{
+      color:rgb(153, 153, 153);
+      font-size: xx-small;
+    }
+    .socialmedia-page{
+      height:20px;
+      width:50px;
+      padding-left:30px;
+    }
+    .lastline-page a{
+      font-size: 15px;
+      font-weight: 700;
+      color:#080808;
+    }
+    .lastline-page{
+      font-size: xx-small;
+      color:#929292;
+    }
+    #copyright{
+      height:15px;
+      width:15px;
+    }
+  }
+  </style>
+  <!--End Of Footer-for-page-->
+
+
+{% endblock %}

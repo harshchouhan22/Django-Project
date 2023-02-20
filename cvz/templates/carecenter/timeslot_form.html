@@ -1,0 +1,205 @@
+{% extends "blog/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block body %}
+
+
+<!-- Header   Of Home page -->
+<div class="Entire-Header">
+  <!-- This is the Menu (Hamburger menu) which was showing on the top-->
+    <nav role="navigation">
+        <div class="logo" ><a href="{% url 'home' %}" style="color:black;">EVE</a></div>
+ <!--  <button type="submit" class="sgnup">Sign Up</button>  -->
+      <div id="menuToggle">
+      <input type="checkbox" />
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+       <div id="profile">
+           <a  href="{% url 'profile' %}"><li>
+             <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+             <p>Hello, {{ request.user.First_Name }}</p></li></a>
+       </div>
+
+           <a href="{% url 'home' %}"><li>Home</li></a><hr/>
+           <a href="{% url 'post' %}" ><li>Health Blog</li></a></hr>
+<hr/>       {% if user.is_authenticated %}
+
+           <a href="{% url 'logout' %}"><li>Logout</li></a><hr/>
+          {% else %}
+           <a href="{% url 'login' %}"><li>Log In</li></a><hr/>
+           <a href="{% url 'register' %}"><li>Sign Up</li></a><hr/>
+          {% endif %}
+      </ul>
+     </div>
+    </nav>
+</div>
+
+<style>
+/* Logo For Desktop */
+@media(min-width:450px) and (max-width:3000px){
+.Entire-Header{
+    height:40px;
+}
+
+.logo{
+    display:block;
+    font-size:25px;
+    font-weight:600;
+    text-align: left;
+    padding-left: 50px;
+    padding-top:0px;
+}
+#menuToggle
+{
+    display: fixed;
+    position: relative;
+    top: -8px;
+    left: 10px;
+    z-index: 1;
+    color:rgb(240, 226, 226);
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+}
+/* For Mobile */
+@media(max-width:450px){
+.Entire-Header{
+      height:40px;
+}
+
+.logo{
+    display:block;
+    font-size:1.8rem;
+    font-weight:600;
+  }
+#menuToggle
+{
+  display: fixed;
+  position: relative;
+  top: -10px;
+  left: 10px;
+  z-index: 1;
+  color:rgb(240, 226, 226);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+}
+</style>
+<!--End Of Header -->
+
+
+
+  <div class="content-section">
+    <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+     <div class="formcontainer">
+      <p>Create TimeSlot</p>
+            {{ form|crispy }}
+       <button id="create-btn" class="btn btn-primary" type="submit" >Create</button>
+     </div>
+    </form>
+  </div>
+
+
+
+<style type="text/css">
+  /*for mobile  */
+
+@media(max-width:450px){
+
+.asteriskField{
+    display:none;
+}
+
+.content-section{
+    display:center;
+    text-align:center;
+    padding-left:12%;
+    padding-top: 10px;
+}
+
+.formcontainer{
+    background-color: rgb(255, 255, 255);
+    border-color: rgb(194, 187, 187);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 1px;
+    text-align:center;
+    width:300px;
+    box-shadow: 0px 1px 5px 3px rgba(0, 0, 0, 0.12);
+}
+.formcontainer p{
+    font-size: 1.5rem;
+    font-weight:400;
+}
+
+.form-group{
+    padding-left: 50px;
+    width:250px;
+}
+
+
+}
+
+/* for desktop middle page */
+@media(min-width:450px) and (max-width:3000px){
+
+.asteriskField{
+    display:none;
+
+}
+label[for="id_start_tim"] {
+    display: none;
+}
+.content-section{
+    overflow: hidden;
+    text-align:center;
+    display: inline-block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 320px;
+    height: 500px;
+    margin: auto;
+}
+.formcontainer{
+    background-color: rgb(255, 255, 255);
+    border-color: rgb(194, 187, 187);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 1px;
+    text-align:center;
+    width:310px;
+    height:500;
+    box-shadow: 0px 1px 5px 3px rgba(0, 0, 0, 0.12);
+}
+.formcontainer p{
+    font-size: 1.5rem;
+    font-weight:400;
+}
+
+.form-group{
+    padding-left: 50px;
+    width:250px;
+    margin-top: px;
+    text-align:center;
+}
+#create-btn{
+  width:150px;
+}
+
+}
+</style>
+
+
+
+
+
+
+{% endblock %}
